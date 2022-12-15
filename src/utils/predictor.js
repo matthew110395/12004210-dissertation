@@ -1,10 +1,19 @@
-import { BasicPitch, outputToNotesPoly, addPitchBendsToNoteEvents, noteFramesToTime } from "@spotify/basic-pitch";
+//TODO
+//Combine notes
+
+import { BasicPitch, outputToNotesPoly, addPitchBendsToNoteEvents, noteFramesToTime,  } from "@spotify/basic-pitch";
 import { render } from '@testing-library/react';
-export function predictor(audioData) {
+function combineConsecutiveNotes(notes){
+    console.log(notes);
+    notes.sort((a,b) => a.startTimeSeconds - b.startTimeSeconds); // b - a for reverse sort
+    console.log(notes);
+    //Combine consecutive notes
+}
+export function predictor(audioData,setNotes) {
     console.log(audioData);
     const audioCtx = new AudioContext({
         sampleRate: 22050
-    });
+        });
     let arrayBuffer = audioData;
     //let audioBuffer = undefined;
     const model = "https://unpkg.com/@spotify/basic-pitch@1.0.1/model/model.json";
@@ -35,7 +44,9 @@ console.log(basicPitch);
                     outputToNotesPoly(frames, onsets, 0.25, 0.25, 5),
                 ),
             );
-            console.log(notes);
+            //console.log(notes);
+            combineConsecutiveNotes(notes);
+            setNotes(notes);
         }
 
         ).catch((error)=>{
