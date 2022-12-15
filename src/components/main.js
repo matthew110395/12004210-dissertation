@@ -1,3 +1,9 @@
+//TODO - Display Music
+//Scoring of playing
+//UI
+//Datbase
+//Auth
+
 import  { useState, useEffect } from 'react'
 import FileUpload from './fileUpload';
 import {predictor} from '../utils/predictor';
