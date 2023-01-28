@@ -1,17 +1,38 @@
 //Aquired fr0m https://github.com/turnerhayes/midixmljs
 
 //TODO
+///CHANGE TO https://www.fluidsynth.org/api/MIDIPlayerMem.html or similar
+
+
+
 //Time signature
 //Note Type
+//PPQ - fixed at 480? can use the from toMidi/Tonejs
 //Bar Length
 //Parts - Impossible/Not required?
 
 import { NoteNumberToName } from "@thayes/midi-tools";
 import XMLWriter from "xml-writer";
 
+function noteType(duration) {
+    const noteTypes =[{note:"64th",notelen: 0.125},
+    {note:"32nd",notelen: 0.125},
+    {note:"16th",notelen: 0.25},
+    {note:"eighth",notelen: 0.5},
+    {note:"quarter",notelen: 1.0},
+    {note:"half",notelen: 2.0},
+    {note:"whole",notelen: 4.0}];
+    
+        const note = noteTypes.reduce((prev, curr)=>{
+            return (Math.abs(curr.notelen - duration) < Math.abs(prev.notelen - duration) ? curr : prev);
+        });
+        console.log(note.note);
+       return note.note.toString()
 
-function writeNotes( {notes, writer, divisions, timeSignature}) {
-    console.log(notes);
+}
+
+
+function writeNotes({ notes, writer, divisions, timeSignature }) {
     let measureNumber = 0;
     writer.startElement("measure").writeAttribute("number", measureNumber);
     writer.startElement("attributes");
@@ -31,32 +52,37 @@ function writeNotes( {notes, writer, divisions, timeSignature}) {
     writer.endElement(); // </attributes>
     notes.forEach(
         ({ pitchMidi, durationSeconds }) => {
-            
+
             measureNumber += 1;
             const noteDescription = NoteNumberToName(pitchMidi);
-
             // <key>
             //   <fifths>-3</fifths>
             //   <mode>minor</mode>
             // </key>
 
-            
+
             if (measureNumber === 1) {
-               
+
             }
             writer.startElement("note");
             writer.startElement("pitch");
             writer.writeElement("step", noteDescription.step);
-            writer.writeElement("octave", noteDescription.octave);
+            if(pitchMidi > 58){
+                writer.writeElement("octave", 5);
+            }else{
+                writer.writeElement("octave", 4);
+            }
+            //writer.writeElement("octave", noteDescription.octave);
             if (noteDescription.alter) {
                 writer.writeElement("alter", noteDescription.alter);
             }
             writer.endElement(); // </pitch>
             writer.writeElement("duration", durationSeconds);
+            writer.writeElement("type",noteType(durationSeconds));
             writer.endElement(); // </note>
-            
+
         }
-        
+
     );
     writer.endElement(); // </measure>
 }
@@ -223,10 +249,10 @@ export function toMusicXML(notes) {
         numerator: 4,
         denominator: 4,
     };
-    const divisions = 1;
+    const divisions = 2;
 
 
-    writer.startElement("part").writeAttribute("id", `P1`);
+    writer.startElement("part").writeAttribute("id", `1`);
     writeNotes({ notes, writer, divisions, timeSignature });
     writer.endElement(); // </part>
     // Object.keys(notesByTrack).forEach(

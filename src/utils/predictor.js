@@ -1,15 +1,42 @@
 //TODO
-//Combine notes
-
+//Ultra short notes?
 import { BasicPitch, outputToNotesPoly, addPitchBendsToNoteEvents, noteFramesToTime,  } from "@spotify/basic-pitch";
 import { render } from '@testing-library/react';
+
+
 function combineConsecutiveNotes(notes){
     console.log(notes);
+    notes= notes.map(({pitchBends,amplitude, ...notes})=>{
+        return notes;
+    });
     notes.sort((a,b) => a.startTimeSeconds - b.startTimeSeconds); // b - a for reverse sort
-    console.log(notes);
-    //Combine consecutive notes
+    let previous;
+    //https://stackoverflow.com/questions/65162390/merge-consecutive-objects-inside-array-with-condition-and-update-the-merged-elem
+    const combnotes = notes.reduce((comb, cur, i) => {
+        cur.start_index = i;
+        cur.end_index = i;
+        if (!previous) {
+          previous = cur;
+          return comb;
+        }
+        if(cur.pitchMidi === previous.pitchMidi){
+            previous.durationSeconds += cur.durationSeconds;
+            previous.end_index = i;
+            return comb;
+        }
+        comb.push(previous);
+        previous = cur;
+        return comb;
+    },[]);
+
+    if (previous){
+        combnotes.push(previous);
+    }
+    console.log(combnotes);
+    return combnotes;
 }
-export function predictor(audioData,setNotes) {
+
+export function predictor(audioData,setNotes,noteBounding) {
     console.log(audioData);
     const audioCtx = new AudioContext({
         sampleRate: 22050
@@ -37,16 +64,17 @@ console.log(basicPitch);
                 pct = p;
             },
         ).then(() => {
-            console.log(frames);
             const notes = noteFramesToTime(
                 addPitchBendsToNoteEvents(
                     contours,
                     outputToNotesPoly(frames, onsets, 0.25, 0.25, 5),
                 ),
             );
-            //console.log(notes);
-            combineConsecutiveNotes(notes);
-            setNotes(notes);
+
+            const combined = combineConsecutiveNotes(notes);
+            const cleaned = combined.filter(note => note.pitchMidi > noteBounding.min && note.pitchMidi < noteBounding.max);
+            console.log(cleaned);
+            setNotes(cleaned);
         }
 
         ).catch((error)=>{

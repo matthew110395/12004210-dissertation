@@ -7,19 +7,28 @@
 import  { useState, useEffect } from 'react'
 import FileUpload from './fileUpload';
 import {predictor} from '../utils/predictor';
-import {toMusicXML} from '../utils/toXML'
+import {toMusicXML} from '../utils/toXML';
+import OpenSheetMusicDisplay from './openSheetMusicDisplay';
+import PianoRoll from './PianoRoll';
 
 
 function Main(){
   const [fileBuffer, setFileBuffer] = useState();
-  const [notes, setNotes] = useState();
+  const [notes, setNotes] = useState([]);
+  const [file, setFile] = useState();
+  
+  const noteBounding = {max:75, min: 53};
+
+  
 
   useEffect(() => {
+    setFile('testScore.xml');
+
         console.log(fileBuffer);
       });
       const handlePredict=  ()=>{
         console.log(fileBuffer);
-        const notes = predictor(fileBuffer,setNotes);
+        const notes = predictor(fileBuffer,setNotes,noteBounding);
       }
       const handleTransform= ()=>{
         console.log(notes);
@@ -32,6 +41,12 @@ return(
         <FileUpload getFile={setFileBuffer}/>
         <button onClick={handlePredict}>Predict</button>
         <button onClick={handleTransform}>Transform</button>
+        <OpenSheetMusicDisplay file={file} />
+        {notes.length >0
+          ?<PianoRoll notes={notes} noteBounding={noteBounding}/>
+          :null
+        }
+        
     </div>
 )
 }
