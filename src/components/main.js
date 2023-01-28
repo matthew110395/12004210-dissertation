@@ -8,7 +8,6 @@ import  { useState, useEffect } from 'react'
 import FileUpload from './fileUpload';
 import {predictor} from '../utils/predictor';
 import {toMusicXML} from '../utils/toXML';
-import OpenSheetMusicDisplay from './openSheetMusicDisplay';
 import PianoRoll from './PianoRoll';
 
 
@@ -41,7 +40,6 @@ return(
         <FileUpload getFile={setFileBuffer}/>
         <button onClick={handlePredict}>Predict</button>
         <button onClick={handleTransform}>Transform</button>
-        <OpenSheetMusicDisplay file={file} />
         {notes.length >0
           ?<PianoRoll notes={notes} noteBounding={noteBounding}/>
           :null
