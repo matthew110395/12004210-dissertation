@@ -9,6 +9,7 @@ import FileUpload from './fileUpload';
 import {predictor} from '../utils/predictor';
 import {toMusicXML} from '../utils/toXML';
 import PianoRoll from './PianoRoll';
+import { logout } from "../firebase";
 
 
 function Main(){
@@ -40,6 +41,7 @@ return(
         <FileUpload getFile={setFileBuffer}/>
         <button onClick={handlePredict}>Predict</button>
         <button onClick={handleTransform}>Transform</button>
+        <button onClick={logout}>LogOut</button>
         {notes.length >0
           ?<PianoRoll notes={notes} noteBounding={noteBounding}/>
           :null

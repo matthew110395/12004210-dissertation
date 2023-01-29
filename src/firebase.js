@@ -15,6 +15,7 @@ import {
   collection,
   where,
   addDoc,
+  serverTimestamp,
 } from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -92,6 +93,50 @@ const sendPasswordReset = async (email) => {
 const logout = () => {
   signOut(auth);
 };
+
+const getUser = () =>{
+
+  const user = auth.currentUser;
+  if (user !== null) {
+    // The user object has basic properties such as display name, email, etc.
+    const userDetails={
+      displayName: user.displayName,
+      email: user.email,
+      photoURL: user.photoURL,
+      emailVerified: user.emailVerified,
+      uid: user.uid
+    };
+    return userDetails
+  }else{
+    console.log("No User Logged In");
+  }
+};
+
+//Add document to collection
+//collection = String containing collection name
+//data = JSON object of data to be entered
+const setDocument = async (collectionName, data) => {
+  data.timestamp = serverTimestamp();
+  const docRef = await addDoc(collection(db, collectionName), data);
+  console.log("Document written with ID: ", docRef.id);
+  
+};
+//Get Documents from collection
+//collection = String containing collection name
+//query = Firebase Query
+const getDocuments = async (collectionName, whereVar) => {
+  const queryVar = query(collection(db, collectionName), whereVar);
+  const data = await getDocs(queryVar);
+  let retData = [];
+  data.forEach((doc) => {
+    // doc.data() is never undefined for query doc snapshots
+    let retbuild = doc.data();
+    retbuild.id = doc.id;
+    retData.push(retbuild);
+  });
+  return retData;
+  
+};
 export {
   auth,
   db,
@@ -100,4 +145,7 @@ export {
   registerWithEmailAndPassword,
   sendPasswordReset,
   logout,
+  getUser,
+  setDocument,
+  getDocuments,
 };

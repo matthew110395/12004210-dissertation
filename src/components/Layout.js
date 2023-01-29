@@ -15,6 +15,9 @@ function Layout() {
           <li>
             <Link to="/login">Login</Link>
           </li>
+          <li>
+            <Link to="/tunes">Tunes</Link>
+          </li>
         </ul>
       </nav>
 

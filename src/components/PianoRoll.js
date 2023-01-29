@@ -1,10 +1,13 @@
 //https://codesandbox.io/s/gwbkt?file=/src/index.js:72-136
 //https://blog.openreplay.com/2d-sketches-with-react-and-the-canvas-api
 import React, { useEffect, useRef, useState  } from 'react'
+import { setDocument, getUser } from '../firebase';
 
 function PianoRoll({notes, noteBounding}) {
 	
     const [drawing, setDrawing] = useState(false);
+	const [tuneName,setTuneName] = useState();
+	const [tuneDesc,setTuneDesc] = useState();
     const canvasRef = useRef(null);
 	// Storing the context in a ref so we can use it
 	// later to draw on the canvas
@@ -56,17 +59,6 @@ function PianoRoll({notes, noteBounding}) {
 
 	}, []);
 
-	const startDraw = ({ nativeEvent }) => {
-		const { offsetX, offsetY } = nativeEvent;
-		ctxRef.current.beginPath();
-		ctxRef.current.moveTo(offsetX, offsetY);
-		setDrawing(true);
-	};
-	const stopDraw = () => {
-		ctxRef.current.closePath();
-		setDrawing(false);
-	};
-
 	const clear = () => {
 		ctxRef.current.clearRect(
 			0,
@@ -75,18 +67,37 @@ function PianoRoll({notes, noteBounding}) {
 			canvasRef.current.height
 		);
 	};
-
-	const draw = ({ nativeEvent }) => {
-		if (!drawing) return;
-		const { offsetX, offsetY } = nativeEvent;
-		ctxRef.current.lineTo(offsetX, offsetY);
-		ctxRef.current.stroke();
+	const save = () =>{
+		notes.forEach(note => {
+			delete note.start_index;
+			delete note.end_index;
+		});
+		const data = {
+			name:tuneName,
+			notes: notes,
+			description:tuneDesc,
+			user: getUser().uid
+		}
+		console.log(data);
+		setDocument("tunes",data);
 	};
+
+
 	
   return (
-    <canvas onMouseDown={startDraw}
-    onMouseUp={stopDraw}
-    onMouseMove={draw} ref={canvasRef}/>
+	<div>
+		<button onClick={save}>Save</button>
+		<label>
+			Tune Name:
+			<input type="text" name="name" onChange={(e) => setTuneName(e.target.value)}/>
+		</label>
+		<label>
+			Tune Notes:
+			<textarea name="description" onChange={(e) => setTuneDesc(e.target.value)}/>
+		</label>
+		
+    <canvas ref={canvasRef}/></div>
+	
   )
 }
 
