@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
+import { predictor } from '../utils/predictor';
 
-function FileUpload({getFile}) {
+function FileUpload({setNotes,noteBounding}) {
     const [selectedFile, setSelectedFile] = useState();
 	const [isFilePicked, setIsFilePicked] = useState(false);
 
@@ -15,7 +16,9 @@ function FileUpload({getFile}) {
             const reader = new FileReader();
             reader.onload = (e) =>{
                 const {result} = e.target;
-                getFile(result);
+                //setFileBuffer(result);
+                predictor(result,setNotes,noteBounding);
+      
             }
             reader.readAsArrayBuffer(selectedFile);
         }
@@ -24,7 +27,7 @@ function FileUpload({getFile}) {
     return (
         <div>
             <h2>Upload File</h2>
-            <input type="file" name="file" onChange={changeHandler} />
+            <input type="file" name="file" onChange={changeHandler} accept="audio/*"/>
             <div>
                 <button onClick={handleSubmission}>Submit</button>
             </div>

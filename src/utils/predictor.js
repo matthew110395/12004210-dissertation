@@ -42,6 +42,8 @@ export function predictor(audioData,setNotes,noteBounding) {
         sampleRate: 22050
         });
     let arrayBuffer = audioData;
+ 
+
     //let audioBuffer = undefined;
     const model = "https://unpkg.com/@spotify/basic-pitch@1.0.1/model/model.json";
     const basicPitch = new BasicPitch(model);

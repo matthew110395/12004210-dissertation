@@ -3,8 +3,8 @@
 import React, { useEffect, useRef, useState  } from 'react'
 import { setDocument, getUser } from '../firebase';
 
-function PianoRoll({notes, noteBounding}) {
-	
+function PianoRoll({baseNotes,overlayNotes = [], noteBounding}) {
+	console.log(overlayNotes);
     const [drawing, setDrawing] = useState(false);
 	const [tuneName,setTuneName] = useState();
 	const [tuneDesc,setTuneDesc] = useState();
@@ -19,15 +19,20 @@ function PianoRoll({notes, noteBounding}) {
 	
 	useEffect(() => {
 		const canvas = canvasRef.current;
-		const tuneLen = notes.at(-1).startTimeSeconds+notes.at(-1).durationSeconds;
+		let tuneLen;
+		if(overlayNotes.length>0){
+			const baseLen =baseNotes.at(-1).startTimeSeconds+baseNotes.at(-1).durationSeconds;
+			const overLen = overlayNotes.at(-1).startTimeSeconds+overlayNotes.at(-1).durationSeconds;
+			tuneLen = baseLen >overLen ?baseLen : overLen;
+		}else{
+			tuneLen = baseNotes.at(-1).startTimeSeconds+baseNotes.at(-1).durationSeconds;
+		}
 		canvas.width = tuneLen * noteScale;
 		canvas.height = barHeight * numNotes;
 		//canvas.style.width = `${window.innerWidth}px`;
 		//canvas.style.height = `${window.innerHeight}px`;
 		var WIDTH = canvas.width;
       	var HEIGHT = canvas.height;
-		console.log(barHeight);
-
 		// Setting the context to enable us draw
 		const ctx = canvas.getContext('2d');
 		//ctx.scale(2, 2);
@@ -46,18 +51,27 @@ function PianoRoll({notes, noteBounding}) {
 		ctx.fillRect(0, 0, WIDTH, HEIGHT);
 		ctx.fillStyle = 'rgb(225, 0, 0)';
 		
-		notes.map(note =>{
+		baseNotes.map(note =>{
 			const topx = note.startTimeSeconds * noteScale;
 			const topy = ((noteBounding.max - note.pitchMidi)*barHeight);
 			const len = note.durationSeconds *noteScale;
-			console.log(topx, topy, len, barHeight)
+			//console.log(topx, topy, len, barHeight)
+			ctx.fillRect(topx, topy, len, barHeight) ;
+		})
+		ctx.stroke();
+		ctx.fillStyle = 'rgb(255, 225, 0,0.5)';
+		overlayNotes.map(note =>{
+			const topx = note.startTimeSeconds * noteScale;
+			const topy = ((noteBounding.max - note.pitchMidi)*barHeight);
+			const len = note.durationSeconds *noteScale;
+			//console.log(topx, topy, len, barHeight)
 			ctx.fillRect(topx, topy, len, barHeight) ;
 		})
 		ctx.stroke();
 		ctxRef.current = ctx;
 
 
-	}, []);
+	}, [overlayNotes]);
 
 	const clear = () => {
 		ctxRef.current.clearRect(
@@ -68,13 +82,13 @@ function PianoRoll({notes, noteBounding}) {
 		);
 	};
 	const save = () =>{
-		notes.forEach(note => {
+		baseNotes.forEach(note => {
 			delete note.start_index;
 			delete note.end_index;
 		});
 		const data = {
 			name:tuneName,
-			notes: notes,
+			notes: baseNotes,
 			description:tuneDesc,
 			user: getUser().uid
 		}

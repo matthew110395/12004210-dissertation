@@ -14,6 +14,7 @@ function App() {
   const [tunes,setTunes] = useState([]);
   const [selectedTune,setselectedTune] = useState();
   console.log(selectedTune);
+  const noteBounding = {max:75, min: 53};
   return (
     <div>
 
@@ -24,7 +25,7 @@ function App() {
           <Route exact path="login" element={<Login />} />
           <Route exact path="/register" element={<Register />} />
           <Route exact path="tunes" element={<TuneList tunes={tunes} setTunes={setTunes} setselectedTune={setselectedTune}/>} />
-          <Route exact path="tune" element={<Tune tune={selectedTune} />} />
+          <Route exact path="tune" element={<Tune selectedTune={selectedTune} tunes={tunes} noteBounding={noteBounding} />} />
         </Route>
       </Routes>
     </div>
