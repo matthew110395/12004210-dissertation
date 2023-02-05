@@ -1,6 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
+import { getFunctions, httpsCallableFromURL  } from 'firebase/functions';
+
 import {
   GoogleAuthProvider, getAuth,
   signInWithPopup,
@@ -16,7 +18,13 @@ import {
   where,
   addDoc,
   serverTimestamp,
+  updateDoc,
+  arrayUnion,
+  doc
 } from "firebase/firestore";
+
+
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -36,6 +44,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const functions = getFunctions(app);
 const analytics = getAnalytics(app);
 
 const googleProvider = new GoogleAuthProvider();
@@ -121,6 +130,16 @@ const setDocument = async (collectionName, data) => {
   console.log("Document written with ID: ", docRef.id);
   
 };
+//Add Score to existing Document
+
+const setSubDocument = async (collectionName,subCollection,docID, data) => {
+  data.timestamp = serverTimestamp();
+  const docRef = doc(db, collectionName, docID);
+  const subRef = await addDoc(collection(docRef, subCollection), data);
+  console.log("Document written with ID: ", subRef.id);
+  
+};
+
 //Get Documents from collection
 //collection = String containing collection name
 //query = Firebase Query
@@ -137,6 +156,31 @@ const getDocuments = async (collectionName, whereVar) => {
   return retData;
   
 };
+
+//Calculate Score
+const fnScore = async (baseNotes,overlayNotes) =>{
+  return new Promise((resolve, reject) => {
+    const payload = {
+      "base":baseNotes,
+      "over":overlayNotes
+    };
+    console.log(payload)
+    const dtweuclidean = httpsCallableFromURL(functions, "https://dtweuclidean-octtayfiya-uc.a.run.app");
+    //const dataret = await dtweuclidean(payload)
+    
+    dtweuclidean(payload)
+      .then((result) =>{
+        resolve(result) 
+      })
+      .catch(err =>{
+        reject(err)
+      })
+
+  })
+  
+
+}
+
 export {
   auth,
   db,
@@ -148,4 +192,6 @@ export {
   getUser,
   setDocument,
   getDocuments,
+  fnScore,
+  setSubDocument
 };

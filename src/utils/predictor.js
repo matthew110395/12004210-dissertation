@@ -75,7 +75,7 @@ console.log(basicPitch);
 
             const combined = combineConsecutiveNotes(notes);
             const cleaned = combined.filter(note => note.pitchMidi > noteBounding.min && note.pitchMidi < noteBounding.max);
-            console.log(cleaned);
+            //console.log(cleaned);
             setNotes(cleaned);
         }
 
