@@ -156,6 +156,36 @@ const getDocuments = async (collectionName, whereVar) => {
   return retData;
   
 };
+//Get Sub Documents from collection
+//collection = String containing collection name
+//query = Firebase Query
+const getSubDocuments = async (collectionName,subCollection,docID) => {
+  const docRef = doc(db, collectionName, docID);
+  
+  const queryVar = collection(docRef, subCollection);
+  const data = await getDocs(queryVar);
+  let retData = [];
+  data.forEach((doc) => {
+    // doc.data() is never undefined for query doc snapshots
+    let retbuild = doc.data();
+    retbuild.id = doc.id;
+    retData.push(retbuild);
+  });
+  return retData;
+  
+};
+const getUserName =  async (uid) =>{
+  const q = query(collection(db, "users"), where("uid", "==", uid));
+  const data = await getDocs(q);
+  let retData = [];
+  data.forEach((doc) => {
+    // doc.data() is never undefined for query doc snapshots
+    const user =  doc.data();
+    retData.push(user.name);
+  });
+  return retData[0]
+ 
+}
 
 //Calculate Score
 const fnScore = async (baseNotes,overlayNotes) =>{
@@ -193,5 +223,7 @@ export {
   setDocument,
   getDocuments,
   fnScore,
-  setSubDocument
+  setSubDocument,
+  getSubDocuments,
+  getUserName
 };

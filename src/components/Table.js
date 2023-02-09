@@ -2,7 +2,8 @@ import React from 'react'
 
 function Table({ headers, data }) {
     return (
-        <table>
+        <div className='table-responsive'>
+            <table className="table">
             <thead>
                 <tr>
                     {headers.map(heading => {
@@ -20,6 +21,7 @@ function Table({ headers, data }) {
                 })}
             </tbody>
         </table>
+        </div>
     )
 }
 
