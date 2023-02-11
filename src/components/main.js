@@ -4,50 +4,46 @@
 //Datbase
 //Auth
 
-import  { useState, useEffect } from 'react'
+import { useState } from 'react'
 import FileUpload from './fileUpload';
-import {predictor} from '../utils/predictor';
-import {toMusicXML} from '../utils/toXML';
+import { predictor } from '../utils/predictor';
+import { toMusicXML } from '../utils/toXML';
 import PianoRoll from './PianoRoll';
 import { logout } from "../firebase";
+import SaveTune from './SaveTune';
+import MusicBanner from '../images/MusicBanner.jpeg'
 
-
-function Main(){
+function Main({ noteBounding }) {
   const [fileBuffer, setFileBuffer] = useState();
   const [notes, setNotes] = useState([]);
   const [file, setFile] = useState();
-  
-  const noteBounding = {max:75, min: 53};
+  const [showSave, setShowSave] = useState(false);
+  console.log(showSave);
+  const handleSaveClose = () => setShowSave(false);
+  const handleSaveShow = () => setShowSave(true);
+  const reset = () => {
+    setNotes([]);
 
-  
+  }
 
-  useEffect(() => {
-    setFile('testScore.xml');
-
-        console.log(fileBuffer);
-      });
-      const handlePredict=  ()=>{
-        console.log(fileBuffer);
-        const notes = predictor(fileBuffer,setNotes,noteBounding);
-      }
-      const handleTransform= ()=>{
-        console.log(notes);
-        toMusicXML(notes);
-      }
-
-return(
+  return (
     <div>
-        <h1>Application</h1>
-        <FileUpload getFile={setFileBuffer}/>
-        <button onClick={handlePredict}>Predict</button>
-        <button onClick={handleTransform}>Transform</button>
-        <button onClick={logout}>LogOut</button>
-        {notes.length >0
-          ?<PianoRoll notes={notes} noteBounding={noteBounding}/>
-          :null
-        }
-        
+      <header class="masthead">
+        <div class="container h-100">
+          <div class="row h-100 align-items-center">
+            <div class="col-12 text-center">
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {notes.length > 0
+        ? <div><PianoRoll baseNotes={notes} noteBounding={noteBounding} /><button className='btn btn-primary' onClick={handleSaveShow}>Save New Tune</button><button className='btn btn-danger' onClick={reset}>Upload a new Tune</button></div>
+        : <FileUpload getFile={setFileBuffer} setNotes={setNotes} noteBounding={noteBounding} />
+      }
+      <SaveTune showSave={showSave} handleSaveClose={handleSaveClose} notes={notes} key="Save" />
+
     </div>
-)
+  )
 }
 export default Main

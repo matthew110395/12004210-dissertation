@@ -1,39 +1,49 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { predictor } from '../utils/predictor';
 
-function FileUpload({setNotes,noteBounding}) {
+function FileUpload({ setNotes, noteBounding }) {
     const [selectedFile, setSelectedFile] = useState();
-	const [isFilePicked, setIsFilePicked] = useState(false);
+    const [isFilePicked, setIsFilePicked] = useState(false);
 
     const changeHandler = (event) => {
 
         setSelectedFile(event.target.files[0]);
-		setIsFilePicked(true);
-	};
+        setIsFilePicked(true);
 
-	const handleSubmission = (event) => {
-        if(isFilePicked){
+    };
+
+    const handleSubmission = (event) => {
+        if (isFilePicked) {
             const reader = new FileReader();
-            reader.onload = (e) =>{
-                const {result} = e.target;
-                //setFileBuffer(result);
-                predictor(result,setNotes,noteBounding);
-      
+            reader.onload = (e) => {
+                const { result } = e.target;
+                predictor(result, setNotes, noteBounding);
+
             }
             reader.readAsArrayBuffer(selectedFile);
+
         }
-        
-	};
+
+    };
+    useEffect(() => {
+        handleSubmission();
+    }, [selectedFile]);
     return (
         <div>
-            <h2>Upload File</h2>
-            <input type="file" name="file" onChange={changeHandler} accept="audio/*"/>
-            <div>
-                <button onClick={handleSubmission}>Submit</button>
+            <div className="file-upload">
+                <div className={isFilePicked ? "spinner-border" : "d-none"} role="status" >
+                    <span className="visually-hidden">Loading...</span>
+                </div>
+                <div className={!isFilePicked ? "image-upload-wrap" : "d-none"}>
+                    <input className="file-upload-input" type='file' onChange={changeHandler} accept="audio/*" />
+                    <div className="drag-text">
+                        <h3>Drag and drop a file or select add Image</h3>
+                    </div>
+                </div>
             </div>
         </div>
     )
-      
+
 }
 
 export default FileUpload

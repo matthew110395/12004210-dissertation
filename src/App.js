@@ -13,7 +13,6 @@ function App() {
   const [user,setUser] = useState();
   const [tunes,setTunes] = useState([]);
   const [selectedTune,setselectedTune] = useState();
-  console.log(selectedTune);
   const noteBounding = {max:75, min: 53};
   return (
     <div>
@@ -21,7 +20,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
 
-          <Route index element={<Main />} />
+          <Route index element={<Main noteBounding={noteBounding}/>} />
           <Route exact path="login" element={<Login />} />
           <Route exact path="/register" element={<Register />} />
           <Route exact path="tunes" element={<TuneList tunes={tunes} setTunes={setTunes} setselectedTune={setselectedTune}/>} />

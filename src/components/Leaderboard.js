@@ -8,8 +8,9 @@ function Leaderboard({ show, handleClose, tune }) {
     const [tuneScores, setTuneScores] = useState(false);
     const tableHeaders = [{ col: "score", title: "Score" }, { col: "userName", title: "User" }, { col: "date", title: "Date" }]
     console.log(tune);
-    let scores=[]
+    
     useEffect(() => {
+        let scores=[];
         getSubDocuments("tunes", "scores", tune)
 
             .then(async (data) => {
@@ -24,13 +25,13 @@ function Leaderboard({ show, handleClose, tune }) {
                     scores.push(retobj);
                 });
                 scores.sort((a,b) =>{
-                    //TODO: SORT BY SCORE THEN DATE
+                    //SORT BY SCORE THEN DATE
                     return b.score - a.score || b.date-a.date
                 })
                  scores.forEach(score =>{
                     score["date"] = score.date.toLocaleString()
                 })
-                console.log(scores);
+              
                 setTuneScores(scores)
             });
     }, []);
