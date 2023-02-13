@@ -31,7 +31,7 @@ function PianoRoll({ baseNotes, overlayNotes = [], noteBounding }) {
 	const barHeight = 20;
 	const numNotes = noteBounding.max - noteBounding.min;
 	let pos = 0;
-	let tuneLen;
+	let tuneLen, displayWidth;
 	const draw = (pos = 0) => {
 		const canvas = canvasRef.current;
 		const ctx = ctxRef.current;
@@ -71,7 +71,7 @@ function PianoRoll({ baseNotes, overlayNotes = [], noteBounding }) {
 		})
 		ctx.stroke();
 		ctxRef.current = ctx;
-
+		
 	}
 
 
@@ -98,7 +98,7 @@ function PianoRoll({ baseNotes, overlayNotes = [], noteBounding }) {
 
 
 		draw()
-
+		displayWidth = document.getElementById("pianoRoll").clientWidth;
 
 	}, [overlayNotes]);
 	const clear = () => {
@@ -111,16 +111,19 @@ function PianoRoll({ baseNotes, overlayNotes = [], noteBounding }) {
 	};
 	const animate = () => {
 		pos++;
+		pos++;
+		pos++;
+		pos++;
 		console.log(playing);
 		//window.setTimeout(animate, 20);
 		requestAnimationFrame(() => {
 			clear();
 			draw(pos);
-			if (playing && pos < tuneLen * noteScale) {
+			if (playing && pos < (tuneLen * noteScale)-displayWidth) {
 				animate()
 			} else {
 				console.log("done");
-				console.log(playing);
+				playing = !playing;
 			}
 
 		})
@@ -134,8 +137,6 @@ function PianoRoll({ baseNotes, overlayNotes = [], noteBounding }) {
 	}
 	const reset = () => {
 		pos = 0;
-
-		//window.setTimeout(animate, 20);
 		requestAnimationFrame(() => {
 			clear();
 			draw(pos);
@@ -146,7 +147,7 @@ function PianoRoll({ baseNotes, overlayNotes = [], noteBounding }) {
 	return (
 		<div>
 
-			<div className='w-75 overflow-hidden'>
+			<div className='w-75 overflow-hidden' id='pianoRoll'>
 				<canvas ref={canvasRef} />
 			</div>
 
