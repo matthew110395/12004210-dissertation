@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Link, useNavigate } from "react-router-dom";
+import { Modal } from "react-bootstrap";
+
 import {
   auth,
   registerWithEmailAndPassword,
   signInWithGoogle,
 } from "../firebase";
-function Register() {
+function Register({ show, handleClose }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -21,7 +23,14 @@ function Register() {
     if (user) history("/");
   }, [user, loading]);
   return (
-    <div className="register">
+    <Modal show={show} onHide={handleClose}>
+      <Modal.Header closeButton>
+        <Modal.Title id="contained-modal-title-vcenter">
+          Register
+        </Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+      <div className="register">
       <div className="register__container">
         <input
           type="text"
@@ -58,6 +67,8 @@ function Register() {
         </div>
       </div>
     </div>
+      </Modal.Body>
+   </Modal>
   );
 }
 export default Register;

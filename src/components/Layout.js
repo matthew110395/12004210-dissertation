@@ -6,8 +6,9 @@ import { faUserShield, faHome, faMusic } from '@fortawesome/free-solid-svg-icons
 import logo from '../images/logo.png';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
-import Login from '../pages/Login';
+import LoginReg from '../pages/Login';
 import LogOut from '../pages/LogOut';
+import Register from '../pages/Register';
 import { getUser } from '../firebase';
 
 function loginOut(userExits){
@@ -32,7 +33,7 @@ function Layout() {
 
     <div>
       {loggedin
-      ? <Login show={show} handleClose={handleClose} />
+      ? <LoginReg show={show} handleClose={handleClose} />
     : <LogOut show={show} handleClose={handleClose} />
     }
 

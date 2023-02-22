@@ -9,16 +9,22 @@ function Tune({ selectedTune, tunes, noteBounding }) {
 
   const [notes, setNotes] = useState([]);
   const setTune = tunes.filter(tune => tune.id == selectedTune);
+  let scoreVal
   console.log(setTune);
   useEffect(() => {
+    console.log("render");
     if (notes.length > 0) {
-      score(selectedTune, setTune[0].notes, notes);
+      scoreVal = score(selectedTune, setTune[0].notes, notes);
     }
   }, [notes]);
   const [show, setShow] = useState(false);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+  const reset = () =>{
+    setNotes([]);
+    console.log(notes);
+  }
   return (
 
     <div>
@@ -26,9 +32,11 @@ function Tune({ selectedTune, tunes, noteBounding }) {
         <button className="btn btn-primary me-md-2" onClick={handleShow} type="button"><FontAwesomeIcon icon={faShieldHalved} /> Leaderboard</button></div>
 
       <Leaderboard show={show} handleClose={handleClose} tune={setTune[0].id} />
-      <FileUpload setNotes={setNotes} noteBounding={noteBounding} />
+      {notes.length === 0 
+      ? <FileUpload setNotes={setNotes} noteBounding={noteBounding} />
+      :<span>You Scored {score}</span>}
       {setTune[0].notes.length > 0
-        ? <PianoRoll baseNotes={setTune[0].notes} overlayNotes={notes} noteBounding={noteBounding} />
+        ? <div><PianoRoll baseNotes={setTune[0].notes} overlayNotes={notes} noteBounding={noteBounding} /> <button onClick={reset}>Play Again</button></div>
         : null
       }
     </div>

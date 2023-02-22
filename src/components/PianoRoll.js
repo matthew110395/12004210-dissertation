@@ -111,9 +111,6 @@ function PianoRoll({ baseNotes, overlayNotes = [], noteBounding }) {
 	};
 	const animate = () => {
 		pos++;
-		pos++;
-		pos++;
-		pos++;
 		console.log(playing);
 		//window.setTimeout(animate, 20);
 		requestAnimationFrame(() => {
@@ -123,7 +120,7 @@ function PianoRoll({ baseNotes, overlayNotes = [], noteBounding }) {
 				animate()
 			} else {
 				console.log("done");
-				playing = !playing;
+
 			}
 
 		})

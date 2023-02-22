@@ -26,6 +26,7 @@ export function score(tune,baseNotes, overlayNotes) {
     }
     console.log (attempt);
     setSubDocument("tunes","scores",tune,attempt);
+    return score;
    })
 
     
