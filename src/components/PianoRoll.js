@@ -9,7 +9,7 @@ function PlayPause({ playPause, reset }) {
 		setPlaying(!playing);
 		playPause();
 	}
-	return (<div>
+	return (<div className='d-flex justify-content-center py-3'>
 		<button className='btn btn-primary' onClick={playClick}>{playing ? "Pause" : "Play"}</button>
 		<button className='btn btn-danger' onClick={reset}>Reset</button>
 	</div>
@@ -38,8 +38,8 @@ function PianoRoll({ baseNotes, overlayNotes = [], noteBounding }) {
 		const WIDTH = canvas.width;
 		const HEIGHT = canvas.height;
 		//ctx.scale(2, 2);
-		ctx.strokeStyle = 'red';
-		ctx.lineWidth = 3;
+		ctx.strokeStyle = 'rgb(192, 192, 192)';
+		ctx.lineWidth = 1.5;
 		ctx.beginPath();
 		let cursor = barHeight;
 		while (cursor < HEIGHT) {
@@ -71,7 +71,7 @@ function PianoRoll({ baseNotes, overlayNotes = [], noteBounding }) {
 		})
 		ctx.stroke();
 		ctxRef.current = ctx;
-		
+
 	}
 
 
@@ -116,7 +116,7 @@ function PianoRoll({ baseNotes, overlayNotes = [], noteBounding }) {
 		requestAnimationFrame(() => {
 			clear();
 			draw(pos);
-			if (playing && pos < (tuneLen * noteScale)-displayWidth) {
+			if (playing && pos < (tuneLen * noteScale) - displayWidth) {
 				animate()
 			} else {
 				console.log("done");
@@ -142,14 +142,15 @@ function PianoRoll({ baseNotes, overlayNotes = [], noteBounding }) {
 
 
 	return (
-		<div>
-
-			<div className='w-75 overflow-hidden' id='pianoRoll'>
-				<canvas ref={canvasRef} />
-			</div>
-
+		<div className='mt-2'>
 			<PlayPause playPause={playPause} reset={reset} />
+			<div className='d-flex justify-content-center'>
+				<div className='w-75 overflow-hidden border border-2 rounded' id='pianoRoll'>
+					<canvas ref={canvasRef} />
+				</div>
+			</div>
 		</div>
+
 
 	)
 }

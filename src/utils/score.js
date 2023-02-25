@@ -3,7 +3,8 @@
 import { fnScore,getUser,setSubDocument } from "../firebase";
 
 export function score(tune,baseNotes, overlayNotes) {
-    const base_score = 1000;
+    return new Promise((resolve, reject) =>{
+        const base_score = 1000;
    let base=[];
    let over=[];
    let score = 0
@@ -26,7 +27,9 @@ export function score(tune,baseNotes, overlayNotes) {
     }
     console.log (attempt);
     setSubDocument("tunes","scores",tune,attempt);
-    return score;
+    resolve(score);
+    })
+    
    })
 
     

@@ -12,6 +12,23 @@ import PianoRoll from './PianoRoll';
 import { logout } from "../firebase";
 import SaveTune from './SaveTune';
 import MusicBanner from '../images/MusicBanner.jpeg'
+import { getUser } from '../firebase';
+
+
+function Save({handleSaveShow, reset}){
+  const user = getUser();
+  console.log(user);
+  const loggedin = !(typeof user === "undefined");
+  return (
+    <div>
+    {loggedin && 
+      <div><button className='btn btn-primary' onClick={handleSaveShow}>Save New Tune</button><button className='btn btn-danger' onClick={reset}>Upload a new Tune</button></div>
+      
+    }
+    </div>
+
+  )
+}
 
 function Main({ noteBounding }) {
   const [fileBuffer, setFileBuffer] = useState();
@@ -28,17 +45,18 @@ function Main({ noteBounding }) {
 
   return (
     <div>
-      <header class="masthead">
-        <div class="container h-100">
-          <div class="row h-100 align-items-center">
-            <div class="col-12 text-center">
+      <header className="masthead">
+        <div className="container h-100">
+          <div className="row h-100 align-items-center">
+            <div className="col-12 text-center text-container">
+              <h1 className='text-white'>pipeTutor</h1>
             </div>
           </div>
         </div>
       </header>
 
       {notes.length > 0
-        ? <div><PianoRoll baseNotes={notes} noteBounding={noteBounding} /><button className='btn btn-primary' onClick={handleSaveShow}>Save New Tune</button><button className='btn btn-danger' onClick={reset}>Upload a new Tune</button></div>
+        ? <div><PianoRoll baseNotes={notes} noteBounding={noteBounding} /><Save handleSaveShow={handleSaveShow} reset={reset} /></div>
         : <FileUpload getFile={setFileBuffer} setNotes={setNotes} noteBounding={noteBounding} />
       }
       <SaveTune showSave={showSave} handleSaveClose={handleSaveClose} notes={notes} key="Save" />

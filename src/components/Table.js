@@ -1,9 +1,9 @@
 import React from 'react'
 
-function Table({ headers, data }) {
+function Table({ headers, data, addClass }) {
     return (
-        <div className='table-responsive'>
-            <table className="table">
+        <div className="table-responsive">
+            <table className={`table  ${addClass}`}>
             <thead>
                 <tr>
                     {headers.map(heading => {

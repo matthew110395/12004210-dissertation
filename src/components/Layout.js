@@ -1,6 +1,6 @@
 //TODO - Add conditional Login/Out
 import React,{useState} from 'react';
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, NavLink } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUserShield, faHome, faMusic } from '@fortawesome/free-solid-svg-icons';
 import logo from '../images/logo.png';
@@ -13,9 +13,9 @@ import { getUser } from '../firebase';
 
 function loginOut(userExits){
   if(userExits){
-   return(<span><FontAwesomeIcon className="bi d-block mx-auto mb-1" icon={faUserShield} /> Login</span>)
+   return(<span><FontAwesomeIcon className="bi d-block mx-auto mb-1" icon={faUserShield} /> Log Out</span>)
   }else{
-    return( <span><FontAwesomeIcon className="bi d-block mx-auto mb-1" icon={faUserShield} /> Log Out</span>)
+    return( <span><FontAwesomeIcon className="bi d-block mx-auto mb-1" icon={faUserShield} /> Login</span>)
   }
   
 }
@@ -27,14 +27,15 @@ function Layout() {
   const handleShow = () => setShow(true);
   const user = getUser();
   console.log(user);
-  const loggedin = (typeof user === "undefined");
+  const loggedin = !(typeof user === "undefined");
   return (
 
 
     <div>
       {loggedin
-      ? <LoginReg show={show} handleClose={handleClose} />
-    : <LogOut show={show} handleClose={handleClose} />
+      ? <LogOut show={show} handleClose={handleClose} />
+    : <LoginReg show={show} handleClose={handleClose} />
+    
     }
 
       <header>
@@ -47,15 +48,16 @@ function Layout() {
 
               <ul className="nav col-12 col-lg-auto my-2 justify-content-center my-md-0 text-small">
                 <li>
-                  <Link to="/" className='nav-link active'> <FontAwesomeIcon className="bi d-block mx-auto mb-1" icon={faHome} /> Home</Link>
+                  <NavLink to="/" className={({isActive})=>isActive ? "active nav-link":"nav-link text-white"}> <FontAwesomeIcon className="bi d-block mx-auto mb-1" icon={faHome} /> Home</NavLink>
                 </li>
                 
-                <li>
-                  <Link to="/tunes" className='nav-link text-white'>
+                {loggedin && <li>
+                  <NavLink to="/tunes" className={({isActive})=>isActive ? "active nav-link":"nav-link text-white"}>
                     <FontAwesomeIcon className="bi d-block mx-auto mb-1" icon={faMusic} />
                     Tunes
-                  </Link>
+                  </NavLink>
                 </li>
+}
                 
                 <li>
                   <a 

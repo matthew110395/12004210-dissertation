@@ -12,7 +12,7 @@ function TuneList({ tunes, setTunes, setselectedTune }) {
 
   const tabledata = tunes.map((tune) => {
     let build = tune;
-    build.link = <button onClick={() => setTune(tune.id)} key={tune.id}>View</button>
+    build.link = <div><button className='btn btn-secondary' onClick={() => setTune(tune.id)} key={tune.id}>View</button><button className='btn btn-primary'  key={`${tune.id}_Share`}>Share</button></div>
     return build;
   });
 
@@ -28,8 +28,17 @@ function TuneList({ tunes, setTunes, setselectedTune }) {
     navigate('/tune');
   };
   return (
-    <div>TuneList<br />
-      {tunes && <Table headers={tableHeaders} data={tabledata} />}
+    <div>
+    <header className="masthead">
+        <div className="container h-100">
+          <div className="row h-100 align-items-center">
+            <div className="col-12 text-center text-container">
+              <h1 className='text-white'>My Tunes</h1>
+            </div>
+          </div>
+        </div>
+      </header>
+      {tunes && <Table headers={tableHeaders} data={tabledata} addClass={"table-dark"} />}
     </div>
   )
 }

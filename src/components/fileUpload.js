@@ -19,6 +19,7 @@ function FileUpload({ setNotes, noteBounding }) {
                 const { result } = e.target;
                 predictor(result, setNotes, noteBounding);
 
+
             }
             reader.readAsArrayBuffer(selectedFile);
 
@@ -37,7 +38,7 @@ function FileUpload({ setNotes, noteBounding }) {
                 <div className={!isFilePicked ? "image-upload-wrap" : "d-none"}>
                     <input className="file-upload-input" type='file' onChange={changeHandler} accept="audio/*" />
                     <div className="drag-text">
-                        <h3>Drag and drop a file or select add Image</h3>
+                        <h3>Drag and drop an audio file or click to select a file</h3>
                     </div>
                 </div>
             </div>
