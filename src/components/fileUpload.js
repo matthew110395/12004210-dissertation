@@ -18,8 +18,6 @@ function FileUpload({ setNotes, noteBounding }) {
             reader.onload = (e) => {
                 const { result } = e.target;
                 predictor(result, setNotes, noteBounding);
-
-
             }
             reader.readAsArrayBuffer(selectedFile);
 
@@ -32,9 +30,14 @@ function FileUpload({ setNotes, noteBounding }) {
     return (
         <div>
             <div className="file-upload">
-                <div className={isFilePicked ? "spinner-border" : "d-none"} role="status" >
-                    <span className="visually-hidden">Loading...</span>
-                </div>
+<div className={isFilePicked ? "d-flex justify-content-center" : "d-none"}>
+<div className={isFilePicked ? "spinner-border text-light pr-5" : "d-none"}>
+    <span className="visually-hidden">Loading...</span>
+</div>
+<h2 className='text-white ms-2'>&nbsp; Predicting...</h2>
+</div>
+
+
                 <div className={!isFilePicked ? "image-upload-wrap" : "d-none"}>
                     <input className="file-upload-input" type='file' onChange={changeHandler} accept="audio/*" />
                     <div className="drag-text">
