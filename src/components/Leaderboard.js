@@ -4,7 +4,7 @@ import { getSubDocuments, getUserName } from '../firebase'
 import Table from './Table';
 
 
-function Leaderboard({ show, handleClose, tune }) {
+function Leaderboard({ show, handleClose, tune, score }) {
     const [tuneScores, setTuneScores] = useState(false);
     const tableHeaders = [{ col: "score", title: "Score" }, { col: "userName", title: "User" }, { col: "date", title: "Date" }]
     console.log(tune);
@@ -17,7 +17,7 @@ function Leaderboard({ show, handleClose, tune }) {
                 data.forEach(score =>{
                     let retobj ={
                         "score":score.score,
-                        "date": score.timestamp.toDate()
+                        "date": score.timestamp === null?"now":score.timestamp.toDate()
                     }
                     getUserName(score.user).then(data=>{
                         retobj["userName"] = data
@@ -34,7 +34,7 @@ function Leaderboard({ show, handleClose, tune }) {
               
                 setTuneScores(scores)
             });
-    }, []);
+    }, [score]);
     console.log(tuneScores)
     return (
         <Modal show={show} onHide={handleClose}>

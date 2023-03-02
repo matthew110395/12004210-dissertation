@@ -73,18 +73,25 @@ function PianoRoll({ baseNotes, overlayNotes = [], noteBounding }) {
 		ctxRef.current = ctx;
 
 	}
-
+	if (overlayNotes.length > 0) {
+		const baseLen = baseNotes.at(-1).startTimeSeconds + baseNotes.at(-1).durationSeconds;
+		const overLen = overlayNotes.at(-1).startTimeSeconds + overlayNotes.at(-1).durationSeconds;
+		tuneLen = baseLen > overLen ? baseLen : overLen;
+	} else {
+		tuneLen = baseNotes.at(-1).startTimeSeconds + baseNotes.at(-1).durationSeconds;
+	}
 
 	useEffect(() => {
 		const canvas = canvasRef.current;
 
-		if (overlayNotes.length > 0) {
+		/* if (overlayNotes.length > 0) {
 			const baseLen = baseNotes.at(-1).startTimeSeconds + baseNotes.at(-1).durationSeconds;
 			const overLen = overlayNotes.at(-1).startTimeSeconds + overlayNotes.at(-1).durationSeconds;
 			tuneLen = baseLen > overLen ? baseLen : overLen;
 		} else {
 			tuneLen = baseNotes.at(-1).startTimeSeconds + baseNotes.at(-1).durationSeconds;
-		}
+		} */
+		console.log(tuneLen);
 		canvas.width = tuneLen * noteScale;
 		canvas.height = barHeight * numNotes;
 		//canvas.style.width = `${window.innerWidth}px`;
@@ -98,7 +105,7 @@ function PianoRoll({ baseNotes, overlayNotes = [], noteBounding }) {
 
 
 		draw()
-		displayWidth = document.getElementById("pianoRoll").clientWidth;
+		
 
 	}, [overlayNotes]);
 	const clear = () => {
@@ -116,6 +123,7 @@ function PianoRoll({ baseNotes, overlayNotes = [], noteBounding }) {
 		requestAnimationFrame(() => {
 			clear();
 			draw(pos);
+			console.log(playing,pos,(tuneLen * noteScale) - displayWidth)
 			if (playing && pos < (tuneLen * noteScale) - displayWidth) {
 				animate()
 			} else {
@@ -128,6 +136,8 @@ function PianoRoll({ baseNotes, overlayNotes = [], noteBounding }) {
 
 	}
 	const playPause = () => {
+		displayWidth = document.getElementById("pianoRoll").clientWidth;
+
 		console.log(playing);
 		playing = !playing;
 		animate();

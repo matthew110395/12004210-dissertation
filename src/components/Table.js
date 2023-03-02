@@ -7,7 +7,7 @@ function Table({ headers, data, addClass }) {
             <thead>
                 <tr>
                     {headers.map(heading => {
-                        return <th key={heading.col}>{heading.title}</th>
+                        return <th key={`${heading.col}_head`}>{heading.title}</th>
                     })}
                 </tr>
             </thead>

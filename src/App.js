@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Routes, Route, Outlet, Link } from "react-router-dom";
-
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from './firebase';
 import logo from './logo.svg';
 import './App.css';
 import Main from './components/main';
@@ -10,9 +11,11 @@ import Register from './pages/Register';
 import TuneList from './pages/TuneList';
 import Tune from './pages/Tune';
 function App() {
-  const [user,setUser] = useState();
+  //const [user,setUser] = useState();
   const [tunes,setTunes] = useState([]);
+  const [shareTunes,setShareTunes] = useState([]);
   const [selectedTune,setselectedTune] = useState();
+  const [user, loading, error] = useAuthState(auth);
   const noteBounding = {max:75, min: 53};
   return (
     <div>
@@ -23,7 +26,7 @@ function App() {
           <Route index element={<Main noteBounding={noteBounding}/>} />
           <Route exact path="login" element={<Login />} />
           <Route exact path="/register" element={<Register />} />
-          <Route exact path="tunes" element={<TuneList tunes={tunes} setTunes={setTunes} setselectedTune={setselectedTune}/>} />
+          <Route exact path="tunes" element={<TuneList tunes={tunes} setTunes={setTunes} shareTunes={shareTunes}  setShareTunes={setShareTunes} setselectedTune={setselectedTune}/>} />
           <Route exact path="tune" element={<Tune selectedTune={selectedTune} tunes={tunes} noteBounding={noteBounding} />} />
         </Route>
       </Routes>

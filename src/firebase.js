@@ -137,8 +137,16 @@ const setSubDocument = async (collectionName,subCollection,docID, data) => {
   const docRef = doc(db, collectionName, docID);
   const subRef = await addDoc(collection(docRef, subCollection), data);
   console.log("Document written with ID: ", subRef.id);
-  
 };
+
+//Add to array in Doc
+const addArray = async (collectionName, docID, item, newData) =>{
+  const docRef = doc(db, collectionName, docID);
+  let updateJSON = {};
+  updateJSON[item] = arrayUnion(newData);
+  await updateDoc(docRef,updateJSON);
+  console.log("Document updated with ID: ", docRef.id);
+}
 
 //Get Documents from collection
 //collection = String containing collection name
@@ -225,5 +233,6 @@ export {
   fnScore,
   setSubDocument,
   getSubDocuments,
-  getUserName
+  getUserName,
+  addArray
 };
