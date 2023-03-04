@@ -30,12 +30,12 @@ function FileUpload({ setNotes, noteBounding }) {
     return (
         <div>
             <div className="file-upload">
-<div className={isFilePicked ? "d-flex justify-content-center" : "d-none"}>
-<div className={isFilePicked ? "spinner-border text-light pr-5" : "d-none"}>
-    <span className="visually-hidden">Loading...</span>
-</div>
-<h2 className='text-white ms-2'>&nbsp; Predicting...</h2>
-</div>
+                <div className={isFilePicked ? "d-flex justify-content-center" : "d-none"}>
+                    <div className={isFilePicked ? "spinner-border text-light pr-5" : "d-none"}>
+                        <span className="visually-hidden">Loading...</span>
+                    </div>
+                    <h2 className='text-white ms-2'>&nbsp; Predicting...</h2>
+                </div>
 
 
                 <div className={!isFilePicked ? "image-upload-wrap" : "d-none"}>
