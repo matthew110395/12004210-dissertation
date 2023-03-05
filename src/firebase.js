@@ -1,7 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getFunctions, httpsCallableFromURL  } from 'firebase/functions';
+import { getFunctions, httpsCallable, httpsCallableFromURL } from 'firebase/functions';
+import axios from "axios";
 
 import {
   GoogleAuthProvider, getAuth,
@@ -22,8 +23,6 @@ import {
   arrayUnion,
   doc
 } from "firebase/firestore";
-
-
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -103,12 +102,12 @@ const logout = () => {
   signOut(auth);
 };
 
-const getUser = () =>{
+const getUser = () => {
 
   const user = auth.currentUser;
   if (user !== null) {
     // The user object has basic properties such as display name, email, etc.
-    const userDetails={
+    const userDetails = {
       displayName: user.displayName,
       email: user.email,
       photoURL: user.photoURL,
@@ -116,7 +115,7 @@ const getUser = () =>{
       uid: user.uid
     };
     return userDetails
-  }else{
+  } else {
     console.log("No User Logged In");
   }
 };
@@ -128,11 +127,11 @@ const setDocument = async (collectionName, data) => {
   data.timestamp = serverTimestamp();
   const docRef = await addDoc(collection(db, collectionName), data);
   console.log("Document written with ID: ", docRef.id);
-  
+
 };
 //Add Score to existing Document
 
-const setSubDocument = async (collectionName,subCollection,docID, data) => {
+const setSubDocument = async (collectionName, subCollection, docID, data) => {
   data.timestamp = serverTimestamp();
   const docRef = doc(db, collectionName, docID);
   const subRef = await addDoc(collection(docRef, subCollection), data);
@@ -140,11 +139,11 @@ const setSubDocument = async (collectionName,subCollection,docID, data) => {
 };
 
 //Add to array in Doc
-const addArray = async (collectionName, docID, item, newData) =>{
+const addArray = async (collectionName, docID, item, newData) => {
   const docRef = doc(db, collectionName, docID);
   let updateJSON = {};
   updateJSON[item] = arrayUnion(newData);
-  await updateDoc(docRef,updateJSON);
+  await updateDoc(docRef, updateJSON);
   console.log("Document updated with ID: ", docRef.id);
 }
 
@@ -162,14 +161,14 @@ const getDocuments = async (collectionName, whereVar) => {
     retData.push(retbuild);
   });
   return retData;
-  
+
 };
 //Get Sub Documents from collection
 //collection = String containing collection name
 //query = Firebase Query
-const getSubDocuments = async (collectionName,subCollection,docID) => {
+const getSubDocuments = async (collectionName, subCollection, docID) => {
   const docRef = doc(db, collectionName, docID);
-  
+
   const queryVar = collection(docRef, subCollection);
   const data = await getDocs(queryVar);
   let retData = [];
@@ -180,42 +179,64 @@ const getSubDocuments = async (collectionName,subCollection,docID) => {
     retData.push(retbuild);
   });
   return retData;
-  
+
 };
-const getUserName =  async (uid) =>{
+const getUserName = async (uid) => {
   const q = query(collection(db, "users"), where("uid", "==", uid));
   const data = await getDocs(q);
   let retData = [];
   data.forEach((doc) => {
     // doc.data() is never undefined for query doc snapshots
-    const user =  doc.data();
+    const user = doc.data();
     retData.push(user.name);
   });
   return retData[0]
- 
+
 }
 
 //Calculate Score
-const fnScore = async (baseNotes,overlayNotes) =>{
+const fnScore = async (baseNotes, overlayNotes) => {
   return new Promise((resolve, reject) => {
     const payload = {
-      "base":baseNotes,
-      "over":overlayNotes
+      "base": baseNotes,
+      "over": overlayNotes
     };
     console.log(payload)
     const dtweuclidean = httpsCallableFromURL(functions, "https://dtweuclidean-octtayfiya-uc.a.run.app");
     //const dataret = await dtweuclidean(payload)
-    
+
     dtweuclidean(payload)
-      .then((result) =>{
-        resolve(result) 
+      .then((result) => {
+        resolve(result)
       })
-      .catch(err =>{
+      .catch(err => {
         reject(err)
       })
 
   })
-  
+}
+
+const fnBasicPitch = async (audioBuffer) => { 
+  return new Promise((resolve, reject) => {
+
+    //const functions = getFunctions();
+    const formData = new FormData();
+    formData.append("File", audioBuffer);
+
+    //const basicPitchPredictor = httpsCallableFromURL(functions, 'https://basicpitch-cloud-octtayfiya-uc.a.run.app');
+    //basicPitchPredictor(formData)
+     axios.post('https://basicpitch-cloud-octtayfiya-uc.a.run.app',formData,{
+      headers:{
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+      .then((result) => {
+        resolve(result.data)
+      })
+      .catch(err => {
+        reject(err)
+      })
+  });
 
 }
 
@@ -231,6 +252,7 @@ export {
   setDocument,
   getDocuments,
   fnScore,
+  fnBasicPitch,
   setSubDocument,
   getSubDocuments,
   getUserName,

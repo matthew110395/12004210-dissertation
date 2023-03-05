@@ -1,0 +1,2 @@
+functions-framework==3.*
+basic-pitch==0.2.3

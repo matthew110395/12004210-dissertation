@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { predictor } from '../utils/predictor';
+//import { fnBasicPitch } from '../firebase';
 
 function FileUpload({ setNotes, noteBounding }) {
     const [selectedFile, setSelectedFile] = useState();
@@ -14,13 +15,20 @@ function FileUpload({ setNotes, noteBounding }) {
 
     const handleSubmission = (event) => {
         if (isFilePicked) {
+            //fnBasicPitch(selectedFile);
             const reader = new FileReader();
+            const readerBlob = new FileReader();
             reader.onload = (e) => {
                 const { result } = e.target;
-                predictor(result, setNotes, noteBounding);
+                
+                predictor(result, setNotes, noteBounding,selectedFile);
+            }
+            readerBlob.onload = (e) =>{
+                const { result } = e.target;
+               // fnBasicPitch(result);
             }
             reader.readAsArrayBuffer(selectedFile);
-
+            readerBlob.readAsDataURL(selectedFile);
         }
 
     };
