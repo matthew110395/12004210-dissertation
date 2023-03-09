@@ -1,0 +1,5 @@
+functions-framework==3.*
+nest_asyncio
+gin
+google-cloud-storage
+git+https://github.com/magenta/mt3.git#egg=mt3
