@@ -39,6 +39,7 @@ function combineConsecutiveNotes(notes) {
 
 
 export function predictor(audioData, setNotes, noteBounding,file) {
+    const t0 = performance.now();
     const mode = "magenta";
     if (mode==="local") {
         const audioCtx = new AudioContext({
@@ -79,7 +80,8 @@ export function predictor(audioData, setNotes, noteBounding,file) {
     
                 const combined = combineConsecutiveNotes(notes);
                 const cleaned = combined.filter(note => note.pitchMidi > noteBounding.min && note.pitchMidi < noteBounding.max);
-                console.log(cleaned);
+                const t1 = performance.now();
+                console.log(`Call to Local took ${t1 - t0} milliseconds.`);
                 setNotes(cleaned);
             }
     
@@ -101,7 +103,8 @@ export function predictor(audioData, setNotes, noteBounding,file) {
             })
             const combined = combineConsecutiveNotes(noteObj);
             const cleaned = combined.filter(note => note.pitchMidi > noteBounding.min && note.pitchMidi < noteBounding.max);
-            console.log(cleaned)
+            const t1 = performance.now();
+            console.log(`Call to Basic Pitch took ${t1 - t0} milliseconds.`);
             setNotes(cleaned);
         })
     }else if(mode ==="magenta"){
@@ -121,7 +124,8 @@ export function predictor(audioData, setNotes, noteBounding,file) {
      
             const combined = combineConsecutiveNotes(noteObj);
             const cleaned = combined.filter(note => note.pitchMidi > noteBounding.min && note.pitchMidi < noteBounding.max);
-            console.log(cleaned)
+            const t1 = performance.now();
+            console.log(`Call to Magenta took ${t1 - t0} milliseconds.`);
             setNotes(cleaned);
         })
     }
