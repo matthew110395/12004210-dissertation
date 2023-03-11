@@ -9,11 +9,14 @@ import t5
 import t5x
 import nest_asyncio
 import json
+from flask import jsonify
 import tempfile
 import numpy as np
 import tensorflow.compat.v2 as tf
 from werkzeug.utils import secure_filename
 from google.cloud import storage
+from google.protobuf.json_format import MessageToJson 
+
 from mt3 import metrics_utils
 from mt3 import models
 from mt3 import network
@@ -258,40 +261,40 @@ def magenta(request):
 
         return ('', 204, headers)
     headers = {
-        'Access-Control-Allow-Origin': '*'
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+
     }
   # Your code here
     # This code will process each file uploaded
-    #try:
-    MODEL = 'mt3'
-    #checkpoint_path = f'/content/checkpoints/{MODEL}/'
-    checkpoint_path='gs://mt3/checkpoints/mt3'
-    inference_model = InferenceModel(checkpoint_path, MODEL)
-    files = request.files.to_dict()
+    try:
+      MODEL = 'mt3'
+      #checkpoint_path = f'/content/checkpoints/{MODEL}/'
+      checkpoint_path='gs://mt3/checkpoints/mt3'
+      inference_model = InferenceModel(checkpoint_path, MODEL)
+      files = request.files.to_dict()
 
-    for file_name, file in files.items():
-            
-            # Note: GCF may not keep files saved locally between invocations.
-            # If you want to preserve the uploaded files, you should save them
-            # to another location (such as a Cloud Storage bucket).
-      file.save(get_file_path(file_name))
-      #print(open(get_file_path(file_name),"rb").read())
-      #print(upload_audio(open(get_file_path(file_name),"rb").read(),sample_rate=SAMPLE_RATE))
-      est_ns = inference_model(note_seq.audio_io.wav_data_to_samples_librosa(open(get_file_path(file_name),"rb").read(), sample_rate=SAMPLE_RATE))
-      #print("test")
-      #print(est_ns)
-
-            # Clear temporary directory
-      for file_name in files:
-        file_path = get_file_path(file_name)
-        os.remove(file_path)
-    
-        response = {
-          "data":{
-            "note_activations": str(est_ns)
-           }  
-        }
-        # Return an HTTP response
-        return (json.dumps(response), 200, headers)
-    #except:
-    #  return ("", 400, headers)
+      for file_name, file in files.items():
+              
+              # Note: GCF may not keep files saved locally between invocations.
+              # If you want to preserve the uploaded files, you should save them
+              # to another location (such as a Cloud Storage bucket).
+        file.save(get_file_path(file_name))
+        #print(open(get_file_path(file_name),"rb").read())
+        #print(upload_audio(open(get_file_path(file_name),"rb").read(),sample_rate=SAMPLE_RATE))
+        est_ns = inference_model(note_seq.audio_io.wav_data_to_samples_librosa(open(get_file_path(file_name),"rb").read(), sample_rate=SAMPLE_RATE))
+        notes = json.loads(MessageToJson(est_ns)) 
+              # Clear temporary directory
+        for file_name in files:
+          file_path = get_file_path(file_name)
+          os.remove(file_path)
+      
+          response = {
+            "data":{
+              "note_activations": notes
+            }  
+          }
+          # Return an HTTP response
+          return (json.dumps(response), 200, headers)
+    except:
+      return ("", 400, headers)
