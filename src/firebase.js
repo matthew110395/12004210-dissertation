@@ -240,6 +240,29 @@ const fnBasicPitch = async (audioBuffer) => {
 
 }
 
+const fnMagenta = async (audioBuffer) => { 
+  return new Promise((resolve, reject) => {
+
+    //const functions = getFunctions();
+    const formData = new FormData();
+    formData.append("File", audioBuffer);
+
+     axios.post('https://magenta-octtayfiya-uc.a.run.app',formData,{
+     //axios.post('http://localhost:8080',formData,{
+      headers:{
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+      .then((result) => {
+        resolve(result.data)
+      })
+      .catch(err => {
+        reject(err)
+      })
+  });
+
+}
+
 export {
   auth,
   db,
@@ -253,6 +276,7 @@ export {
   getDocuments,
   fnScore,
   fnBasicPitch,
+  fnMagenta,
   setSubDocument,
   getSubDocuments,
   getUserName,

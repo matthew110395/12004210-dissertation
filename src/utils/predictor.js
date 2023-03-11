@@ -2,7 +2,7 @@
 //Ultra short notes?
 import { BasicPitch, outputToNotesPoly, addPitchBendsToNoteEvents, noteFramesToTime, } from "@spotify/basic-pitch";
 import { render } from '@testing-library/react';
-import { fnBasicPitch } from "../firebase";
+import { fnBasicPitch, fnMagenta } from "../firebase";
 
 function combineConsecutiveNotes(notes) {
     
@@ -39,8 +39,8 @@ function combineConsecutiveNotes(notes) {
 
 
 export function predictor(audioData, setNotes, noteBounding,file) {
-    const local = true;
-    if (local) {
+    const mode = "magenta";
+    if (mode==="local") {
         const audioCtx = new AudioContext({
             sampleRate: 22050
         });
@@ -89,7 +89,7 @@ export function predictor(audioData, setNotes, noteBounding,file) {
     
             );
         });
-    }else{
+    }else if (mode ==="cloud"){
         fnBasicPitch(file)
         .then(result =>{
             let notes = result.data.note_activations;
@@ -99,6 +99,26 @@ export function predictor(audioData, setNotes, noteBounding,file) {
                 note['durationSeconds'] = note.endTimeSeconds - note.startTimeSeconds 
                 return note
             })
+            const combined = combineConsecutiveNotes(noteObj);
+            const cleaned = combined.filter(note => note.pitchMidi > noteBounding.min && note.pitchMidi < noteBounding.max);
+            console.log(cleaned)
+            setNotes(cleaned);
+        })
+    }else if(mode ==="magenta"){
+        fnMagenta(file)
+        .then(result =>{
+            let notes = result.data.note_activations.notes;
+            let noteObj=[];
+            //notes = notes.unshift(["startTimeSeconds","endTimeSeconds","pitchMIDI","amplitude","pitchBends"]);
+            notes.map(note => {
+                let retObj={};
+                retObj['startTimeSeconds'] = note.startTime;
+                retObj['endTimeSeconds'] = note.endTime;
+                retObj['pitchMidi'] = note.pitch;
+                retObj['durationSeconds'] = note.endTime - note.startTime 
+                noteObj.push(retObj); 
+            });
+     
             const combined = combineConsecutiveNotes(noteObj);
             const cleaned = combined.filter(note => note.pitchMidi > noteBounding.min && note.pitchMidi < noteBounding.max);
             console.log(cleaned)
