@@ -10,6 +10,11 @@ function TuneList({ tunes, setTunes,shareTunes,setShareTunes, setselectedTune })
   const navigate = useNavigate();
   const [shareTune,setShareTune] = useState();
   const [show, setShow] = useState(false);
+  const user = getUser();
+  const loggedin = !(typeof user === "undefined");
+  if (!loggedin){
+    navigate('/');
+  }
  
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -28,12 +33,12 @@ function TuneList({ tunes, setTunes,shareTunes,setShareTunes, setselectedTune })
   });
 
   useEffect(() => {
-    const query = where("user", "==", getUser().uid);
+    const query = where("user", "==", user.uid);
     getDocuments("tunes", query)
       .then(data => {
         setTunes(data);
       })
-      const shareQuery = where("sharedWith", "array-contains", getUser().uid);
+      const shareQuery = where("sharedWith", "array-contains", user.uid);
     getDocuments("tunes", shareQuery)
       .then(data => {
         setShareTunes(data);
@@ -42,7 +47,6 @@ function TuneList({ tunes, setTunes,shareTunes,setShareTunes, setselectedTune })
   const setTune = (tune) => {
     const allTunes = tunes.concat(shareTunes);
     const tuneData = allTunes.filter(allTunes => allTunes.id == tune);
-    console.log(allTunes,tuneData)
     setselectedTune(tuneData)
     navigate('/tune');
   };

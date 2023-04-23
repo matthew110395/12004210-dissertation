@@ -1,5 +1,5 @@
 import React, { useState, useEffect, } from 'react'
-import { useLocation } from 'react-router-dom';
+import { useLocation ,useNavigate} from 'react-router-dom';
 import PianoRoll from '../components/PianoRoll'
 import FileUpload from '../components/fileUpload';
 import Leaderboard from '../components/Leaderboard';
@@ -12,7 +12,12 @@ function Tune({ selectedTune, tunes, noteBounding }) {
   const [notes, setNotes] = useState([]);
   const [scoreVal, setScoreVal] = useState();
   const [highScore, setHighScore] = useState();
+  const history = useNavigate();
   const user = getUser();
+  const loggedin = !(typeof user === "undefined");
+  if (!loggedin){
+    history('/');
+  }
   //const setTune = tunes.filter(tune => tune.id == selectedTune);
   const setTune = selectedTune;
   useEffect(() => {
@@ -47,36 +52,37 @@ function Tune({ selectedTune, tunes, noteBounding }) {
        
       });
   }
-  return (
-
-    <div>
-      <header className="masthead">
-        <div className="container h-100">
-          <div className="row h-100 align-items-center">
-            <div className="col-12 text-center text-container">
-              <h1 className='text-white'>{setTune[0].name}</h1>
-              <p class="lead text-white">
-                {setTune[0].description}
-              </p>
+  
+    return (
+    
+      <div>
+        <header className="masthead">
+          <div className="container h-100">
+            <div className="row h-100 align-items-center">
+              <div className="col-12 text-center text-container">
+                <h1 className='text-white'>{setTune[0].name}</h1>
+                <p class="lead text-white">
+                  {setTune[0].description}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      </header>
-      <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-        <button className="btn btn-primary me-md-2" onClick={handleShow} type="button"><FontAwesomeIcon icon={faShieldHalved} /> Leaderboard</button></div>
-    {highScore && <span className='text-white'>Your High Score: {highScore}</span>}
-      <Leaderboard show={show} handleClose={handleClose} tune={setTune[0].id} score={scoreVal}/>
-      {notes.length === 0
-        ? <FileUpload setNotes={setNotes} noteBounding={noteBounding} />
-        : <div><span className='text-white'>You Scored {scoreVal}</span><button className='btn btn-secondary' onClick={reset}>Play Again</button></div>}
-      {setTune[0].notes.length > 0
-        ? <div><PianoRoll baseNotes={setTune[0].notes} overlayNotes={notes} noteBounding={noteBounding} /></div>
-        : null
-      }
-      
-    </div>
-
-  )
+        </header>
+        <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+          <button className="btn btn-primary me-md-2" onClick={handleShow} type="button"><FontAwesomeIcon icon={faShieldHalved} /> Leaderboard</button></div>
+      {highScore && <span className='text-white'>Your High Score: {highScore}</span>}
+        <Leaderboard show={show} handleClose={handleClose} tune={setTune[0].id} score={scoreVal}/>
+        {notes.length === 0
+          ? <FileUpload setNotes={setNotes} noteBounding={noteBounding} />
+          : <div><span className='text-white'>You Scored {scoreVal}</span><button className='btn btn-secondary' onClick={reset}>Play Again</button></div>}
+        {setTune[0].notes.length > 0
+          ? <div><PianoRoll baseNotes={setTune[0].notes} overlayNotes={notes} noteBounding={noteBounding} /></div>
+          : null
+        }
+        
+      </div>
+    )
+  
 }
 
 export default Tune

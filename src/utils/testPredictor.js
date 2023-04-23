@@ -2,7 +2,35 @@
 //Ultra short notes?
 import { BasicPitch, outputToNotesPoly, addPitchBendsToNoteEvents, noteFramesToTime, } from "@spotify/basic-pitch";
 import { render } from '@testing-library/react';
-import { fnBasicPitch, fnMagenta } from "../firebase";
+import { fnBasicPitch, fnMagenta, fnScore } from "../firebase";
+
+function score(baseNotes, overlayNotes) {
+    return new Promise((resolve, reject) =>{
+        const base_score = 1000;
+   let base=[];
+   let over=[];
+   let score = 0
+   baseNotes.forEach(note => {
+    base.push([note.pitchMidi,note.durationSeconds]);
+   });
+   overlayNotes.forEach(note => {
+    over.push([note.pitchMidi,note.durationSeconds]);
+   });
+   
+   fnScore(base,over) 
+   .then(result =>{
+    if(result.data.distance <= base_score){
+        score = Math.round(base_score-result.data.distance)
+    }
+    resolve(score);
+    })
+    
+   })
+
+    
+
+}
+
 
 function combineConsecutiveNotes(notes) {
     
@@ -38,10 +66,16 @@ function combineConsecutiveNotes(notes) {
 }
 
 
-export function predictor(audioData, setNotes, noteBounding,file) {
-    const t0 = performance.now();
-    const mode = "cloud";
-    if (mode==="local") {
+
+export async function predictor(audioData, setNotes, noteBounding,file) {
+    const baseline = [{ "startTimeSeconds":0.97, "pitchMidi": 58,"durationSeconds": 2.34},{ "startTimeSeconds":3.31, "pitchMidi": 59,"durationSeconds": 2.07},{ "startTimeSeconds":5.38, "pitchMidi": 61,"durationSeconds": 1.95},{ "startTimeSeconds":7.33, "pitchMidi": 62,"durationSeconds": 2.16},{ "startTimeSeconds":9.49, "pitchMidi": 64,"durationSeconds": 1.83},{ "startTimeSeconds":11.32, "pitchMidi": 66,"durationSeconds": 1.93},{ "startTimeSeconds":13.25, "pitchMidi": 67,"durationSeconds": 2.17},{ "startTimeSeconds":15.42, "pitchMidi": 69,"durationSeconds": 2.08},{ "startTimeSeconds":17.5, "pitchMidi": 55,"durationSeconds": 2.02},{ "startTimeSeconds":19.52, "pitchMidi": 58,"durationSeconds": 2.7}];
+
+    let results = [];
+    let lcom,ccom,mcom = false;
+    
+    const mode = "magenta";
+    //if (mode==="local") {
+        const t0l = performance.now();
         const audioCtx = new AudioContext({
             sampleRate: 22050
         });
@@ -51,7 +85,7 @@ export function predictor(audioData, setNotes, noteBounding,file) {
         //let audioBuffer = undefined;
         const model = "https://unpkg.com/@spotify/basic-pitch@1.0.1/model/model.json";
         const basicPitch = new BasicPitch(model);
-        audioCtx.decodeAudioData(arrayBuffer).then((audioBuffer) => {
+        audioCtx.decodeAudioData(arrayBuffer).then(async(audioBuffer) => {
             console.log(JSON.stringify(Array.from(audioBuffer.getChannelData(0).buffer)));
             //fnBasicPitch(JSON.stringify(audioBuffer.getChannelData(0).buffer));
             const frames = [];
@@ -59,7 +93,7 @@ export function predictor(audioData, setNotes, noteBounding,file) {
             const contours = [];
             let pct = 0;
     
-            basicPitch.evaluateModel(
+             await basicPitch.evaluateModel(
                 audioBuffer,
                 (f, o, c) => {
                     frames.push(...f);
@@ -69,31 +103,39 @@ export function predictor(audioData, setNotes, noteBounding,file) {
                 (p) => {
                     pct = p;
                 },
-            ).then(() => {
+            ).then(async () => {
                 const notes = noteFramesToTime(
                     addPitchBendsToNoteEvents(
                         contours,
-                        outputToNotesPoly(frames, onsets, 0.25, 0.25, 5),
+                        outputToNotesPoly(frames, onsets),
                     ),
                 );
-                console.log(notes);
+                //console.log(notes);
     
                 const combined = combineConsecutiveNotes(notes);
                 const cleaned = combined.filter(note => note.pitchMidi > noteBounding.min && note.pitchMidi < noteBounding.max);
-                const t1 = performance.now();
-                console.log(`Call to Local took ${t1 - t0} milliseconds.`);
+                const t1l = performance.now();
+                //console.log(`Call to Local took ${t1l - t0l} milliseconds.`);
+                
+                lcom=true;
+                //retVals(lcom,ccom,mcom,results);
                 setNotes(cleaned);
+                const sval= await score (baseline,cleaned)
+                results.push(["local",sval]);
+                console.log("local",sval);
             }
     
             ).catch((error) => {
-                console.error("Cannot Predict", error);
+                results.push(["local","ERR"]) ;
+                //console.error("Cannot Predict", error);
             }
     
             );
         });
-    }else if (mode ==="cloud"){
-        fnBasicPitch(file)
-        .then(result =>{
+    //}else if (mode ==="cloud"){
+        const t0c = performance.now();
+        await fnBasicPitch(file)
+        .then(async result =>{
             let notes = result.data.note_activations;
             //notes = notes.unshift(["startTimeSeconds","endTimeSeconds","pitchMIDI","amplitude","pitchBends"]);
             let noteObj = notes.map(([startTimeSeconds, endTimeSeconds, pitchMidi,amplitude, pitchBends]) => ({ startTimeSeconds, endTimeSeconds, pitchMidi,amplitude, pitchBends }));
@@ -103,17 +145,21 @@ export function predictor(audioData, setNotes, noteBounding,file) {
             })
             const combined = combineConsecutiveNotes(noteObj);
             const cleaned = combined.filter(note => note.pitchMidi > noteBounding.min && note.pitchMidi < noteBounding.max);
-            const t1 = performance.now();
-            console.log(`Call to Basic Pitch took ${t1 - t0} milliseconds.`);
-            setNotes(cleaned);
+            const t1c = performance.now();
+            //console.log(`Call to Basic Pitch took ${t1c - t0c} milliseconds.`);
+            const sval= await score (baseline,cleaned)
+            results.push(["cloud",sval]);
+            console.log("cloud",sval);
+            //retVals(lcom,ccom,mcom,results);
         })
-    }else if(mode ==="magenta"){
-        fnMagenta(file)
-        .then(result =>{
+    //}else if(mode ==="magenta"){
+        const t0m = performance.now();
+        await fnMagenta(file)
+        .then(async result =>{
             let notes = result.data.note_activations.notes;
             let noteObj=[];
             //notes = notes.unshift(["startTimeSeconds","endTimeSeconds","pitchMIDI","amplitude","pitchBends"]);
-            notes.map(note => {
+            notes.map(async note => {
                 let retObj={};
                 retObj['startTimeSeconds'] = note.startTime;
                 retObj['endTimeSeconds'] = note.endTime;
@@ -124,11 +170,18 @@ export function predictor(audioData, setNotes, noteBounding,file) {
      
             const combined = combineConsecutiveNotes(noteObj);
             const cleaned = combined.filter(note => note.pitchMidi > noteBounding.min && note.pitchMidi < noteBounding.max);
-            const t1 = performance.now();
-            console.log(`Call to Magenta took ${t1 - t0} milliseconds.`);
-            setNotes(cleaned);
+            const t1m = performance.now();
+            //console.log(`Call to Magenta took ${t1m - t0m} milliseconds.`);
+            const sval= await score (baseline,cleaned)
+            results.push(["magenta",sval]);
+            console.log("magenta",sval);
         })
-    }
+        .catch(err =>{
+            results.push(["magenta","ERR"]) ;
+        })
+        //console.log("end");
+        return results
+    //}
 
 }
 

@@ -10,6 +10,7 @@ import Layout from './components/Layout';
 import Register from './pages/Register';
 import TuneList from './pages/TuneList';
 import Tune from './pages/Tune';
+import Test from './pages/Test';
 function App() {
   //const [user,setUser] = useState();
   const [tunes,setTunes] = useState([]);
@@ -28,6 +29,7 @@ function App() {
           <Route exact path="/register" element={<Register />} />
           <Route exact path="tunes" element={<TuneList tunes={tunes} setTunes={setTunes} shareTunes={shareTunes}  setShareTunes={setShareTunes} setselectedTune={setselectedTune}/>} />
           <Route exact path="tune" element={<Tune selectedTune={selectedTune} tunes={tunes} noteBounding={noteBounding} />} />
+          <Route exact path='test'element={<Test noteBounding={noteBounding}/>} />
         </Route>
       </Routes>
     </div>

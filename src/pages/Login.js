@@ -152,7 +152,7 @@ function LoginReg({ show, handleClose }) {
 
         {mode === "Login" &&
           <div class="d-grid gap-2 d-md-block">
-            <Link to="/reset" className="btn btn-secondary">Forgoten Password</Link>
+            <Link to="/reset" className="btn btn-secondary">Forgotten Password</Link>
             <button
               className="btn btn-primary"
               onClick={() => logInWithEmailAndPassword(email, password)}
