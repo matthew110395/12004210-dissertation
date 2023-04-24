@@ -9,7 +9,7 @@ function PlayPause({ playPause, reset }) {
 		setPlaying(!playing);
 		playPause();
 	}
-	return (<div className='d-flex justify-content-center py-3'>
+	return (<div className='d-flex justify-content-center py-3 gap-2'>
 		<button className='btn btn-primary' onClick={playClick}>{playing ? "Pause" : "Play"}</button>
 		<button className='btn btn-danger' onClick={reset}>Reset</button>
 	</div>

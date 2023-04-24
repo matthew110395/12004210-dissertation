@@ -4,7 +4,7 @@ import { auth, logInWithEmailAndPassword, signInWithGoogle, registerWithEmailAnd
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Modal } from "react-bootstrap";
 
-function Register({ setMode, email, setEmail, password, setPassword, name, setName }) {
+function Register({ setMode, email, setEmail, password, setPassword, name, setName,regError,loginGoogle }) {
 
 
   const toLogin = () => {
@@ -13,6 +13,9 @@ function Register({ setMode, email, setEmail, password, setPassword, name, setNa
 
   return (
     <div className="w-100 p-3">
+      <div className={`mb-3 alert alert-danger ${regError.length == 0 && 'd-none'}`} role="alert">
+        {regError}
+      </div>
       <div className="mb-3">
         <label for="fName" className="form-label">Full Name</label>
 
@@ -52,7 +55,7 @@ function Register({ setMode, email, setEmail, password, setPassword, name, setNa
         Already have an account? <a onClick={toLogin} href="#">Login</a> now.
       </div>
       <hr></hr>
-      <button className="w-100 btn btn-lg btn-outline-primary" onClick={signInWithGoogle}>
+      <button className="w-100 btn btn-lg btn-outline-primary" onClick={loginGoogle}>
         <span class="google_icon"></span>
         <span class="buttonText">Sign in with Google</span>
       </button>
@@ -62,7 +65,7 @@ function Register({ setMode, email, setEmail, password, setPassword, name, setNa
   )
 }
 
-function Login({ handleClose, setMode, email, setEmail, password, setPassword }) {
+function Login({ handleClose, setMode, email, setEmail, password, setPassword, regError, loginGoogle }) {
   const navigate = useNavigate();
   const toReg = () => {
     setMode("Register")
@@ -70,6 +73,9 @@ function Login({ handleClose, setMode, email, setEmail, password, setPassword })
   return (
 
     <div className="w-100 p-3">
+      <div className={`mb-3 alert alert-danger ${regError.length == 0 && 'd-none'}`} role="alert">
+        {regError}
+      </div>
 
       <div className="mb-3">
         <label for="email" className="form-label">Email address</label>
@@ -80,6 +86,7 @@ function Login({ handleClose, setMode, email, setEmail, password, setPassword })
           onChange={(e) => setEmail(e.target.value)}
           placeholder="E-mail Address"
           id="email"
+          required
         />
       </div>
       <div className="mb-3">
@@ -91,6 +98,7 @@ function Login({ handleClose, setMode, email, setEmail, password, setPassword })
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
           id="pass"
+          required
         />
       </div>
       <div>
@@ -98,7 +106,7 @@ function Login({ handleClose, setMode, email, setEmail, password, setPassword })
       </div>
 
       <hr></hr>
-      <button className="w-100 btn btn-lg btn-outline-primary" onClick={signInWithGoogle}>
+      <button className="w-100 btn btn-lg btn-outline-primary" onClick={loginGoogle}>
         <span class="google_icon"></span>
         <span class="buttonText">Sign in with Google</span>
       </button>
@@ -115,16 +123,46 @@ function LoginReg({ show, handleClose }) {
   const [password, setPassword] = useState("");
   const [mode, setMode] = useState("Login")
   const [name, setName] = useState("");
+  const [regError, setRegError] = useState("");
   const [user, loading, error] = useAuthState(auth);
   const register = () => {
     if (!name) alert("Please enter name");
-    registerWithEmailAndPassword(name, email, password);
+    registerWithEmailAndPassword(name, email, password)
+      .then((err) =>{
+        if(typeof err ==="undefined"){
+          handleClose();
+        }
+        if (err.code === "auth/email-already-in-use"){
+          setRegError("Username Already in Use");
+        }else{
+          setRegError(err.message);
+        }
+      });
+  };
+  const login = () => {
+    if (!email || !password){
+      setRegError("Username and Password must be Entered");
+      return null;
+    }
+    logInWithEmailAndPassword(email, password)
+    .then((err) =>{
+      if(typeof err ==="undefined"){
+        handleClose();
+      }
+      if (err.code === "auth/user-not-found" ||err.code === "auth/wrong-password"){
+        setRegError("Username or Password Incorrect");
+      }else{
+        setRegError(err.message);
+      }
+    });
+
+  };
+  const loginGoogle = ()=>{
+    signInWithGoogle();
+    handleClose();
   };
   useEffect(() => {
-    if (loading) {
-      // maybe trigger a loading screen
-      return;
-    }
+ 
     //if (user) navigate("/");
     if (user) handleClose()
   }, [user, loading]);
@@ -141,10 +179,10 @@ function LoginReg({ show, handleClose }) {
       </Modal.Header>
       <Modal.Body>
         {mode === "Login" &&
-          <Login handleClose={handleClose} setMode={setMode} email={email} setEmail={setEmail} password={password} setPassword={setPassword} name={name} setName={setName} />
+          <Login handleClose={handleClose} setMode={setMode} email={email} setEmail={setEmail} password={password} setPassword={setPassword} name={name} setName={setName} regError={regError} loginGoogle={loginGoogle}/>
         }
         {mode === "Register" &&
-          <Register handleClose={handleClose} setMode={setMode} email={email} setEmail={setEmail} password={password} setPassword={setPassword} />
+          <Register handleClose={handleClose} setMode={setMode} email={email} setEmail={setEmail} password={password} setPassword={setPassword} name={name} setName={setName} regError={regError} loginGoogle={loginGoogle}/>
         }
 
       </Modal.Body>
@@ -155,7 +193,7 @@ function LoginReg({ show, handleClose }) {
             <Link to="/reset" className="btn btn-secondary">Forgotten Password</Link>
             <button
               className="btn btn-primary"
-              onClick={() => logInWithEmailAndPassword(email, password)}
+              onClick={login}
             >        Login
             </button>
           </div>

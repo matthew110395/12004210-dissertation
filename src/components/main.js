@@ -22,7 +22,7 @@ function Save({handleSaveShow, reset}){
   return (
     <div>
     {loggedin && 
-      <div><button className='btn btn-primary' onClick={handleSaveShow}>Save New Tune</button><button className='btn btn-danger' onClick={reset}>Upload a new Tune</button></div>
+      <div className='d-flex justify-content-center py-3 gap-2'><button className='btn btn-primary' onClick={handleSaveShow}>Save New Tune</button><button className='btn btn-danger' onClick={reset}>Upload a new Tune</button></div>
       
     }
     </div>

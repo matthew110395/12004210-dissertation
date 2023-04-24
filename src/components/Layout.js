@@ -8,7 +8,6 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import LoginReg from '../pages/Login';
 import LogOut from '../pages/LogOut';
-import Register from '../pages/Register';
 import { getUser } from '../firebase';
 
 function loginOut(userExits){
@@ -26,17 +25,10 @@ function Layout() {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const user = getUser();
-  console.log(user);
   const loggedin = !(typeof user === "undefined");
   return (
-
-
     <div>
-      {loggedin
-      ? <LogOut show={show} handleClose={handleClose} />
-    : <LoginReg show={show} handleClose={handleClose} />
-    
-    }
+   
 
       <header>
         <div className="px-3 py-2 text-bg-dark">
@@ -75,7 +67,11 @@ function Layout() {
         </div>
        
       </header>
-
+      {loggedin
+      ? <LogOut show={show} handleClose={handleClose} />
+    : <LoginReg show={show} handleClose={handleClose} />
+    
+    }
 
 
       {/* An <Outlet> renders whatever child route is currently active,

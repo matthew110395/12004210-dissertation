@@ -63,7 +63,7 @@ const signInWithGoogle = async () => {
     }
   } catch (err) {
     console.error(err);
-    alert(err.message);
+    return err
   }
 };
 const logInWithEmailAndPassword = async (email, password) => {
@@ -71,7 +71,7 @@ const logInWithEmailAndPassword = async (email, password) => {
     await signInWithEmailAndPassword(auth, email, password);
   } catch (err) {
     console.error(err);
-    alert(err.message);
+    return err
   }
 };
 const registerWithEmailAndPassword = async (name, email, password) => {
@@ -86,7 +86,7 @@ const registerWithEmailAndPassword = async (name, email, password) => {
     });
   } catch (err) {
     console.error(err);
-    alert(err.message);
+    return(err);
   }
 };
 const sendPasswordReset = async (email) => {
@@ -126,8 +126,8 @@ const getUser = () => {
 const setDocument = async (collectionName, data) => {
   data.timestamp = serverTimestamp();
   const docRef = await addDoc(collection(db, collectionName), data);
-  console.log("Document written with ID: ", docRef.id);
-
+  //console.log("Document written with ID: ", docRef.id);
+  return docRef.id;
 };
 //Add Score to existing Document
 

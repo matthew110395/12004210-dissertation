@@ -7,7 +7,6 @@ import './App.css';
 import Main from './components/main';
 import Login from './pages/Login';
 import Layout from './components/Layout';
-import Register from './pages/Register';
 import TuneList from './pages/TuneList';
 import Tune from './pages/Tune';
 import Test from './pages/Test';
@@ -26,7 +25,6 @@ function App() {
 
           <Route index element={<Main noteBounding={noteBounding}/>} />
           <Route exact path="login" element={<Login />} />
-          <Route exact path="/register" element={<Register />} />
           <Route exact path="tunes" element={<TuneList tunes={tunes} setTunes={setTunes} shareTunes={shareTunes}  setShareTunes={setShareTunes} setselectedTune={setselectedTune}/>} />
           <Route exact path="tune" element={<Tune selectedTune={selectedTune} tunes={tunes} noteBounding={noteBounding} />} />
           <Route exact path='test'element={<Test noteBounding={noteBounding}/>} />
