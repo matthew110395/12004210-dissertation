@@ -23,7 +23,7 @@ function TuneList({ tunes, setTunes,shareTunes,setShareTunes, setselectedTune })
 
   const tabledata = tunes.map((tune) => {
     let build = tune;
-    build.link = <div><button className='btn btn-secondary' onClick={() => setTune(tune.id)} key={`${tune.id}_View`}>View</button><button className='btn btn-primary' onClick={() => share(tune.id)} key={`${tune.id}_Share`}>Share</button></div>
+    build.link = <div className='d-flex justify-content-center gap-2'><button className='btn btn-secondary' onClick={() => setTune(tune.id)} key={`${tune.id}_View`}>View</button><button className='btn btn-primary' onClick={() => share(tune.id)} key={`${tune.id}_Share`}>Share</button></div>
     return build;
   });
   const shareTabledata = shareTunes.map((tune) => {

@@ -75,9 +75,7 @@ export function predictor(audioData, setNotes, noteBounding,file) {
                         contours,
                         outputToNotesPoly(frames, onsets, 0.25, 0.25, 5),
                     ),
-                );
-                console.log(notes);
-    
+                );    
                 const combined = combineConsecutiveNotes(notes);
                 const cleaned = combined.filter(note => note.pitchMidi > noteBounding.min && note.pitchMidi < noteBounding.max);
                 const t1 = performance.now();
