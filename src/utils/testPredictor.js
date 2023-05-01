@@ -1,5 +1,4 @@
-//TODO
-//Ultra short notes?
+//FOR TESTING ONLY
 import { BasicPitch, outputToNotesPoly, addPitchBendsToNoteEvents, noteFramesToTime, } from "@spotify/basic-pitch";
 import { render } from '@testing-library/react';
 import { fnBasicPitch, fnMagenta, fnScore } from "../firebase";

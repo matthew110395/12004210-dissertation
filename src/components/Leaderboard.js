@@ -1,41 +1,38 @@
-import React, { useEffect,useState } from 'react'
+//Leaderboard modal component
+import React, { useEffect, useState } from 'react'
 import { Modal } from 'react-bootstrap'
 import { getSubDocuments, getUserName } from '../firebase'
 import Table from './Table';
 
-
 function Leaderboard({ show, handleClose, tune, score }) {
     const [tuneScores, setTuneScores] = useState(false);
+    //Build table
     const tableHeaders = [{ col: "score", title: "Score" }, { col: "userName", title: "User" }, { col: "date", title: "Date" }]
-    console.log(tune);
-    
     useEffect(() => {
-        let scores=[];
+        let scores = [];
+        //Get Scores
         getSubDocuments("tunes", "scores", tune)
-
             .then(async (data) => {
-                data.forEach(score =>{
-                    let retobj ={
-                        "score":score.score,
-                        "date": score.timestamp === null?"now":score.timestamp.toDate()
+                data.forEach(score => {
+                    let retobj = {
+                        "score": score.score,
+                        "date": score.timestamp === null ? "now" : score.timestamp.toDate()
                     }
-                    getUserName(score.user).then(data=>{
+                    getUserName(score.user).then(data => {
                         retobj["userName"] = data
                     });
                     scores.push(retobj);
                 });
-                scores.sort((a,b) =>{
+                scores.sort((a, b) => {
                     //SORT BY SCORE THEN DATE
-                    return b.score - a.score || b.date-a.date
+                    return b.score - a.score || b.date - a.date
                 })
-                 scores.forEach(score =>{
+                scores.forEach(score => {
                     score["date"] = score.date.toLocaleString()
                 })
-              
                 setTuneScores(scores)
             });
     }, [score]);
-    console.log(tuneScores)
     return (
         <Modal show={show} onHide={handleClose}>
             <Modal.Header closeButton>

@@ -1,6 +1,8 @@
 {
   "name": "pipeTutor",
   "version": "0.1.0",
+  "homepage": "https://github.com/matthew110395/12004210-dissertation",
+  "author": {"name": "Matthew Smith", "email": "matthew@matthew95.co.uk"},
   "private": true,
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.2.1",

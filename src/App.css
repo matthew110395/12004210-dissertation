@@ -142,3 +142,6 @@ body {
   background-image: radial-gradient(rgba(0, 0, 0, 0.6),rgba(0, 0, 0, 0));
   
 }
+#piano{
+  margin-top: -0.5rem;
+}

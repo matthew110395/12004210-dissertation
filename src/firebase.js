@@ -1,4 +1,4 @@
-// Import the functions you need from the SDKs you need
+//Customised Firebase util functions
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFunctions, httpsCallable, httpsCallableFromURL } from 'firebase/functions';
@@ -86,7 +86,7 @@ const registerWithEmailAndPassword = async (name, email, password) => {
     });
   } catch (err) {
     console.error(err);
-    return(err);
+    return (err);
   }
 };
 const sendPasswordReset = async (email) => {
@@ -129,8 +129,8 @@ const setDocument = async (collectionName, data) => {
   //console.log("Document written with ID: ", docRef.id);
   return docRef.id;
 };
-//Add Score to existing Document
 
+//Add document to a sub collection
 const setSubDocument = async (collectionName, subCollection, docID, data) => {
   data.timestamp = serverTimestamp();
   const docRef = doc(db, collectionName, docID);
@@ -181,6 +181,7 @@ const getSubDocuments = async (collectionName, subCollection, docID) => {
   return retData;
 
 };
+//Get Users Name
 const getUserName = async (uid) => {
   const q = query(collection(db, "users"), where("uid", "==", uid));
   const data = await getDocs(q);
@@ -194,7 +195,7 @@ const getUserName = async (uid) => {
 
 }
 
-//Calculate Score
+//Calculate Score using Google Cloud Function
 const fnScore = async (baseNotes, overlayNotes) => {
   return new Promise((resolve, reject) => {
     const payload = {
@@ -216,17 +217,14 @@ const fnScore = async (baseNotes, overlayNotes) => {
   })
 }
 
-const fnBasicPitch = async (audioBuffer) => { 
+//Run BasicPitch Predictor cloud function
+const fnBasicPitch = async (audioBuffer) => {
   return new Promise((resolve, reject) => {
-
-    //const functions = getFunctions();
     const formData = new FormData();
     formData.append("File", audioBuffer);
 
-    //const basicPitchPredictor = httpsCallableFromURL(functions, 'https://basicpitch-cloud-octtayfiya-uc.a.run.app');
-    //basicPitchPredictor(formData)
-     axios.post('https://basicpitch-cloud-octtayfiya-uc.a.run.app',formData,{
-      headers:{
+    axios.post('https://basicpitch-cloud-octtayfiya-uc.a.run.app', formData, {
+      headers: {
         'Content-Type': 'multipart/form-data'
       }
     })
@@ -240,16 +238,14 @@ const fnBasicPitch = async (audioBuffer) => {
 
 }
 
-const fnMagenta = async (audioBuffer) => { 
+//Run Magenta Google Cloud Function
+const fnMagenta = async (audioBuffer) => {
   return new Promise((resolve, reject) => {
 
-    //const functions = getFunctions();
     const formData = new FormData();
     formData.append("File", audioBuffer);
-
-     axios.post('https://magenta-octtayfiya-uc.a.run.app',formData,{
-     //axios.post('http://localhost:8080',formData,{
-      headers:{
+    axios.post('https://magenta-octtayfiya-uc.a.run.app', formData, {
+      headers: {
         'Content-Type': 'multipart/form-data'
       }
     })

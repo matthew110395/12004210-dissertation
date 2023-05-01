@@ -1,19 +1,18 @@
+//Login and Register component
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import { auth, logInWithEmailAndPassword, signInWithGoogle, registerWithEmailAndPassword } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Modal } from "react-bootstrap";
 
-function Register({ setMode, email, setEmail, password, setPassword, name, setName,regError,loginGoogle }) {
-
-
+//Registration form
+function Register({ setMode, email, setEmail, password, setPassword, name, setName, regError, loginGoogle }) {
   const toLogin = () => {
     setMode("Login")
   }
 
   return (
     <div className="w-100 p-3">
-      <div className={`mb-3 alert alert-danger ${regError.length == 0 && 'd-none'}`} role="alert">
+      <div className={`mb-3 alert alert-danger ${regError.length === 0 && 'd-none'}`} role="alert">
         {regError}
       </div>
       <div className="mb-3">
@@ -59,21 +58,19 @@ function Register({ setMode, email, setEmail, password, setPassword, name, setNa
         <span class="google_icon"></span>
         <span class="buttonText">Sign in with Google</span>
       </button>
-
-
     </div>
   )
 }
 
+//Login Form
 function Login({ handleClose, setMode, email, setEmail, password, setPassword, regError, loginGoogle }) {
-  const navigate = useNavigate();
   const toReg = () => {
     setMode("Register")
   }
   return (
 
     <div className="w-100 p-3">
-      <div className={`mb-3 alert alert-danger ${regError.length == 0 && 'd-none'}`} role="alert">
+      <div className={`mb-3 alert alert-danger ${regError.length === 0 && 'd-none'}`} role="alert">
         {regError}
       </div>
 
@@ -125,45 +122,49 @@ function LoginReg({ show, handleClose }) {
   const [name, setName] = useState("");
   const [regError, setRegError] = useState("");
   const [user, loading, error] = useAuthState(auth);
+
   const register = () => {
     if (!name) alert("Please enter name");
     registerWithEmailAndPassword(name, email, password)
-      .then((err) =>{
-        if(typeof err ==="undefined"){
+      .then((err) => {
+        if (typeof err === "undefined") {
           handleClose();
         }
-        if (err.code === "auth/email-already-in-use"){
+        //Custom validation
+        if (err.code === "auth/email-already-in-use") {
           setRegError("Username Already in Use");
-        }else{
+        } else {
           setRegError(err.message);
         }
       });
   };
+
   const login = () => {
-    if (!email || !password){
+    if (!email || !password) {
       setRegError("Username and Password must be Entered");
       return null;
     }
     logInWithEmailAndPassword(email, password)
-    .then((err) =>{
-      if(typeof err ==="undefined"){
-        handleClose();
-      }
-      if (err.code === "auth/user-not-found" ||err.code === "auth/wrong-password"){
-        setRegError("Username or Password Incorrect");
-      }else{
-        setRegError(err.message);
-      }
-    });
+      .then((err) => {
+        if (typeof err === "undefined") {
+          handleClose();
+        }
+        //Custom validation
+        if (err.code === "auth/user-not-found" || err.code === "auth/wrong-password") {
+          setRegError("Username or Password Incorrect");
+        } else {
+          setRegError(err.message);
+        }
+      });
 
   };
-  const loginGoogle = ()=>{
+
+  const loginGoogle = () => {
     signInWithGoogle();
     handleClose();
   };
+
   useEffect(() => {
- 
-    //if (user) navigate("/");
     if (user) handleClose()
   }, [user, loading]);
   return (
@@ -179,10 +180,10 @@ function LoginReg({ show, handleClose }) {
       </Modal.Header>
       <Modal.Body>
         {mode === "Login" &&
-          <Login handleClose={handleClose} setMode={setMode} email={email} setEmail={setEmail} password={password} setPassword={setPassword} name={name} setName={setName} regError={regError} loginGoogle={loginGoogle}/>
+          <Login handleClose={handleClose} setMode={setMode} email={email} setEmail={setEmail} password={password} setPassword={setPassword} name={name} setName={setName} regError={regError} loginGoogle={loginGoogle} />
         }
         {mode === "Register" &&
-          <Register handleClose={handleClose} setMode={setMode} email={email} setEmail={setEmail} password={password} setPassword={setPassword} name={name} setName={setName} regError={regError} loginGoogle={loginGoogle}/>
+          <Register handleClose={handleClose} setMode={setMode} email={email} setEmail={setEmail} password={password} setPassword={setPassword} name={name} setName={setName} regError={regError} loginGoogle={loginGoogle} />
         }
 
       </Modal.Body>
@@ -203,8 +204,6 @@ function LoginReg({ show, handleClose }) {
             <button className="btn btn-primary" onClick={register}> Register
             </button>
           </div>
-
-
         }
       </Modal.Footer>
     </Modal>

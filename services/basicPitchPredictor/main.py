@@ -1,3 +1,8 @@
+#BasicPitch Google Cloud Function
+#Customised Boilerplate for Python Google Cloud Function
+
+#Matthew Smith - 12004210
+#May 2023
 import os
 import tempfile
 import numpy as np
@@ -28,6 +33,7 @@ def get_file_path(filename):
 # Register an HTTP function with the Functions Framework
 @functions_framework.http
 def basicPitch(request):
+    #CORS Handling
     if request.method == 'OPTIONS':
         # Allows GET requests from any origin with the Content-Type
         # header and caches preflight response for an 3600s
@@ -47,11 +53,9 @@ def basicPitch(request):
     try:
       files = request.files.to_dict()
       for file_name, file in files.items():
-          # Note: GCF may not keep files saved locally between invocations.
-          # If you want to preserve the uploaded files, you should save them
-          # to another location (such as a Cloud Storage bucket).
+
           file.save(get_file_path(file_name))
-          
+          #Run Predictor
           model_output, midi_data, note_activations = predict(get_file_path(file_name))
           print('Processed file: %s' % file_name)
 
@@ -66,7 +70,7 @@ def basicPitch(request):
         }  
       }
       print(note_activations)
-      # Return an HTTP response
+      # Return an HTTP response with JSON encoded
       return (json.dumps(response, cls=NpEncoder), 200, headers)
     except:
       return ("", 400, headers)

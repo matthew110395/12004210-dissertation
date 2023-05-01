@@ -1,15 +1,6 @@
 //Aquired fr0m https://github.com/turnerhayes/midixmljs
 
-//TODO
-///CHANGE TO https://www.fluidsynth.org/api/MIDIPlayerMem.html or similar
-
-
-
-//Time signature
-//Note Type
-//PPQ - fixed at 480? can use the from toMidi/Tonejs
-//Bar Length
-//Parts - Impossible/Not required?
+//NOT USED
 
 import { NoteNumberToName } from "@thayes/midi-tools";
 import XMLWriter from "xml-writer";

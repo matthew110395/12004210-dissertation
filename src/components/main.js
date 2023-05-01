@@ -1,46 +1,33 @@
-//TODO - Display Music
-//Scoring of playing
-//UI
-//Datbase
-//Auth
-
+//Home page
 import { useState } from 'react'
 import FileUpload from './fileUpload';
-import { predictor } from '../utils/predictor';
-import { toMusicXML } from '../utils/toXML';
 import PianoRoll from './PianoRoll';
-import { logout } from "../firebase";
 import SaveTune from './SaveTune';
-import MusicBanner from '../images/MusicBanner.jpeg'
 import { getUser } from '../firebase';
 
-
-function Save({handleSaveShow, reset}){
+//Save New Tune if logged in
+function Save({ handleSaveShow, reset }) {
   const user = getUser();
-  console.log(user);
   const loggedin = !(typeof user === "undefined");
   return (
     <div>
-    {loggedin && 
-      <div className='d-flex justify-content-center py-3 gap-2'><button className='btn btn-primary' onClick={handleSaveShow}>Save New Tune</button><button className='btn btn-danger' onClick={reset}>Upload a new Tune</button></div>
-      
-    }
+      {loggedin &&
+        <div className='d-flex justify-content-center py-3 gap-2'><button className='btn btn-primary' onClick={handleSaveShow}>Save New Tune</button><button className='btn btn-danger' onClick={reset}>Upload a new Tune</button></div>
+      }
     </div>
 
   )
 }
 
+//Build page
 function Main({ noteBounding }) {
   const [fileBuffer, setFileBuffer] = useState();
   const [notes, setNotes] = useState([]);
-  const [file, setFile] = useState();
   const [showSave, setShowSave] = useState(false);
-  console.log(showSave);
   const handleSaveClose = () => setShowSave(false);
   const handleSaveShow = () => setShowSave(true);
   const reset = () => {
     setNotes([]);
-
   }
 
   return (
@@ -60,7 +47,6 @@ function Main({ noteBounding }) {
         : <FileUpload getFile={setFileBuffer} setNotes={setNotes} noteBounding={noteBounding} />
       }
       <SaveTune showSave={showSave} handleSaveClose={handleSaveClose} notes={notes} key="Save" />
-
     </div>
   )
 }

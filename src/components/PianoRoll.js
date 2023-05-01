@@ -1,8 +1,7 @@
-//https://codesandbox.io/s/gwbkt?file=/src/index.js:72-136
-//https://blog.openreplay.com/2d-sketches-with-react-and-the-canvas-api
-import { render } from '@testing-library/react';
+//Build PianoRoll Visulisation
 import React, { useEffect, useRef, useState } from 'react'
 
+//Conditional Play Pause Button
 function PlayPause({ playPause, reset }) {
 	const [playing, setPlaying] = useState(false);
 	const playClick = () => {
@@ -16,15 +15,9 @@ function PlayPause({ playPause, reset }) {
 	)
 }
 
-
+//Build PianoRoll
 function PianoRoll({ baseNotes, overlayNotes = [], noteBounding }) {
-	const [drawing, setDrawing] = useState(false);
-	const [tuneName, setTuneName] = useState();
-	const [tuneDesc, setTuneDesc] = useState();
-
 	const canvasRef = useRef(null);
-	// Storing the context in a ref so we can use it
-	// later to draw on the canvas
 	const ctxRef = useRef(null);
 	let playing = false;
 	const noteScale = 100;
@@ -37,7 +30,6 @@ function PianoRoll({ baseNotes, overlayNotes = [], noteBounding }) {
 		const ctx = ctxRef.current;
 		const WIDTH = canvas.width;
 		const HEIGHT = canvas.height;
-		//ctx.scale(2, 2);
 		ctx.strokeStyle = 'rgb(192, 192, 192)';
 		ctx.lineWidth = 1.5;
 		ctx.beginPath();
@@ -47,32 +39,33 @@ function PianoRoll({ baseNotes, overlayNotes = [], noteBounding }) {
 			ctx.lineTo(WIDTH, cursor);
 			cursor += barHeight;
 		}
-
 		ctx.stroke();
 		ctx.fillStyle = 'rgb(0, 0, 0)';
 		ctx.fillRect(0, 0, WIDTH, HEIGHT);
 		ctx.fillStyle = 'rgb(225, 0, 0)';
-
+		//Draw nones on canvas for all tunes
 		baseNotes.map(note => {
 			const topx = note.startTimeSeconds * noteScale;
 			const topy = ((noteBounding.max - note.pitchMidi) * barHeight);
 			const len = note.durationSeconds * noteScale;
-			//console.log(topx, topy, len, barHeight)
 			ctx.fillRect(topx - pos, topy, len, barHeight);
+			return null;
 		})
 		ctx.stroke();
 		ctx.fillStyle = 'rgb(255, 225, 0,0.5)';
+		//Draw notes if playing against new tune
 		overlayNotes.map(note => {
 			const topx = note.startTimeSeconds * noteScale;
 			const topy = ((noteBounding.max - note.pitchMidi) * barHeight);
 			const len = note.durationSeconds * noteScale;
-			//console.log(topx, topy, len, barHeight)
 			ctx.fillRect(topx - pos, topy, len, barHeight);
+			return null;
 		})
 		ctx.stroke();
 		ctxRef.current = ctx;
 
 	}
+	//Calculate tune length whichever is longest
 	if (overlayNotes.length > 0) {
 		const baseLen = baseNotes.at(-1).startTimeSeconds + baseNotes.at(-1).durationSeconds;
 		const overLen = overlayNotes.at(-1).startTimeSeconds + overlayNotes.at(-1).durationSeconds;
@@ -82,32 +75,15 @@ function PianoRoll({ baseNotes, overlayNotes = [], noteBounding }) {
 	}
 
 	useEffect(() => {
+		//Set canvas width and height based on notes in tune
 		const canvas = canvasRef.current;
-
-		/* if (overlayNotes.length > 0) {
-			const baseLen = baseNotes.at(-1).startTimeSeconds + baseNotes.at(-1).durationSeconds;
-			const overLen = overlayNotes.at(-1).startTimeSeconds + overlayNotes.at(-1).durationSeconds;
-			tuneLen = baseLen > overLen ? baseLen : overLen;
-		} else {
-			tuneLen = baseNotes.at(-1).startTimeSeconds + baseNotes.at(-1).durationSeconds;
-		} */
-		console.log(tuneLen);
 		canvas.width = tuneLen * noteScale;
 		canvas.height = barHeight * numNotes;
-		//canvas.style.width = `${window.innerWidth}px`;
-		//canvas.style.height = `${window.innerHeight}px`;
-
-		// Setting the context to enable us draw
 		const ctx = canvas.getContext('2d');
 		ctxRef.current = ctx;
-
-
-
-
 		draw()
-		
-
 	}, [overlayNotes]);
+
 	const clear = () => {
 		ctxRef.current.clearRect(
 			0,
@@ -116,32 +92,24 @@ function PianoRoll({ baseNotes, overlayNotes = [], noteBounding }) {
 			canvasRef.current.height
 		);
 	};
+	//Scrolling canvas
 	const animate = () => {
 		pos++;
-		console.log(playing);
-		//window.setTimeout(animate, 20);
 		requestAnimationFrame(() => {
 			clear();
 			draw(pos);
-			console.log(playing,pos,(tuneLen * noteScale) - displayWidth)
 			if (playing && pos < (tuneLen * noteScale) - displayWidth) {
 				animate()
-			} else {
-				console.log("done");
-
 			}
-
 		})
-
-
 	}
+	//Scrolling canvas play pause
 	const playPause = () => {
 		displayWidth = document.getElementById("pianoRoll").clientWidth;
-
-		console.log(playing);
 		playing = !playing;
 		animate();
 	}
+
 	const reset = () => {
 		pos = 0;
 		requestAnimationFrame(() => {
@@ -149,7 +117,6 @@ function PianoRoll({ baseNotes, overlayNotes = [], noteBounding }) {
 			draw(pos);
 		})
 	}
-
 
 	return (
 		<div className='mt-2'>
@@ -160,8 +127,6 @@ function PianoRoll({ baseNotes, overlayNotes = [], noteBounding }) {
 				</div>
 			</div>
 		</div>
-
-
 	)
 }
 

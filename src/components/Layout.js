@@ -1,22 +1,20 @@
-//TODO - Add conditional Login/Out
-import React,{useState} from 'react';
+//Scafolding layout component
+import React, { useState } from 'react';
 import { Outlet, NavLink } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUserShield, faHome, faMusic } from '@fortawesome/free-solid-svg-icons';
 import logo from '../images/logo.png';
-import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
 import LoginReg from '../pages/Login';
 import LogOut from '../pages/LogOut';
 import { getUser } from '../firebase';
 
-function loginOut(userExits){
-  if(userExits){
-   return(<span><FontAwesomeIcon className="bi d-block mx-auto mb-1" icon={faUserShield} /> Log Out</span>)
-  }else{
-    return( <span><FontAwesomeIcon className="bi d-block mx-auto mb-1" icon={faUserShield} /> Login</span>)
+//Conditional login/out icon
+function loginOut(userExits) {
+  if (userExits) {
+    return (<span><FontAwesomeIcon className="bi d-block mx-auto mb-1" icon={faUserShield} /> Log Out</span>)
+  } else {
+    return (<span><FontAwesomeIcon className="bi d-block mx-auto mb-1" icon={faUserShield} /> Login</span>)
   }
-  
 }
 
 function Layout() {
@@ -25,11 +23,10 @@ function Layout() {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const user = getUser();
+  localStorage.setItem("user", JSON.stringify(user));
   const loggedin = !(typeof user === "undefined");
   return (
     <div>
-   
-
       <header>
         <div className="px-3 py-2 text-bg-dark">
           <div className="container">
@@ -40,38 +37,34 @@ function Layout() {
 
               <ul className="nav col-12 col-lg-auto my-2 justify-content-center my-md-0 text-small">
                 <li>
-                  <NavLink to="/" className={({isActive})=>isActive ? "active nav-link":"nav-link text-white"}> <FontAwesomeIcon className="bi d-block mx-auto mb-1" icon={faHome} /> Home</NavLink>
+                  <NavLink to="/" className={({ isActive }) => isActive ? "active nav-link" : "nav-link text-white"}> <FontAwesomeIcon className="bi d-block mx-auto mb-1" icon={faHome} /> Home</NavLink>
                 </li>
-                
+
                 {loggedin && <li>
-                  <NavLink to="/tunes" className={({isActive})=>isActive ? "active nav-link":"nav-link text-white"}>
+                  <NavLink to="/tunes" className={({ isActive }) => isActive ? "active nav-link" : "nav-link text-white"}>
                     <FontAwesomeIcon className="bi d-block mx-auto mb-1" icon={faMusic} />
                     Tunes
                   </NavLink>
                 </li>
-}
-                
+                }
                 <li>
-                  <a 
-                   className='nav-link text-white'
-                   onClick={handleShow}
-                   >
-                    {loginOut(loggedin)} 
-                    </a>               
+                  <a
+                    className='nav-link text-white'
+                    onClick={handleShow}
+                  >
+                    {loginOut(loggedin)}
+                  </a>
                 </li>
-
-                
               </ul>
             </div>
           </div>
         </div>
-       
+
       </header>
       {loggedin
-      ? <LogOut show={show} handleClose={handleClose} />
-    : <LoginReg show={show} handleClose={handleClose} />
-    
-    }
+        ? <LogOut show={show} handleClose={handleClose} />
+        : <LoginReg show={show} handleClose={handleClose} />
+      }
 
 
       {/* An <Outlet> renders whatever child route is currently active,

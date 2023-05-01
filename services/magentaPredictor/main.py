@@ -1,3 +1,8 @@
+#Magenta MT3 Cloud Predictor
+#Based on https://colab.research.google.com/github/magenta/mt3/blob/main/mt3/colab/music_transcription_with_transformers.ipynb
+
+#Matthew Smith - 12004210
+#May 2023
 import functions_framework
 import functools
 import os
@@ -32,26 +37,19 @@ nest_asyncio.apply()
 SAMPLE_RATE = 16000
 SF2_PATH = 'SGM-v2.01-Sal-Guit-Bass-V1.3.sf2'
 
-#storage_client = storage.Client.create_anonymous_client()
-#bucket = storage_client.get_bucket('mt3')
-#blobs= bucket.list_blobs(prefix='checkpoints/')
-#for blob in blobs:
-#  print(blob)
-
 # Helper function that computes the filepath to save files to
 def get_file_path(filename):
     # Note: tempfile.gettempdir() points to an in-memory file system
     # on GCF. Thus, any files in it must fit in the instance's memory.
     file_name = secure_filename(filename)
     return os.path.join(tempfile.gettempdir(), file_name)
+#Encode Audio
 def upload_audio(filePath,sample_rate):
   return note_seq.audio_io.wav_data_to_samples_librosa(
     filePath, sample_rate=sample_rate)
 
-
 class InferenceModel(object):
   """Wrapper of T5X model for music transcription."""
-
   def __init__(self, checkpoint_path, model_type='mt3'):
 
     # Model Constants.
@@ -249,6 +247,7 @@ class InferenceModel(object):
 # Register an HTTP function with the Functions Framework
 @functions_framework.http
 def magenta(request):
+    #CORS Handling
     if request.method == 'OPTIONS':
         # Allows GET requests from any origin with the Content-Type
         # header and caches preflight response for an 3600s
@@ -269,22 +268,18 @@ def magenta(request):
     # This code will process each file uploaded
     try:
       MODEL = 'mt3'
-      #checkpoint_path = f'/content/checkpoints/{MODEL}/'
+      #Point model directly at google storage using signed URL as running within google
       checkpoint_path='gs://mt3/checkpoints/mt3'
       inference_model = InferenceModel(checkpoint_path, MODEL)
       files = request.files.to_dict()
 
       for file_name, file in files.items():
               
-              # Note: GCF may not keep files saved locally between invocations.
-              # If you want to preserve the uploaded files, you should save them
-              # to another location (such as a Cloud Storage bucket).
         file.save(get_file_path(file_name))
-        #print(open(get_file_path(file_name),"rb").read())
-        #print(upload_audio(open(get_file_path(file_name),"rb").read(),sample_rate=SAMPLE_RATE))
+        #Run Predictor
         est_ns = inference_model(note_seq.audio_io.wav_data_to_samples_librosa(open(get_file_path(file_name),"rb").read(), sample_rate=SAMPLE_RATE))
+        #Change format from ProtoBuffer
         notes = json.loads(MessageToJson(est_ns)) 
-              # Clear temporary directory
         for file_name in files:
           file_path = get_file_path(file_name)
           os.remove(file_path)
