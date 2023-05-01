@@ -79,8 +79,8 @@ function TuneList({ shareTunes, setShareTunes, setselectedTune }) {
           </div>
         </div>
       </header>
-      {tunes && <div><h2 className='text-white'>My Tunes</h2><Table headers={tableHeaders} data={tabledata} addClass={"table-dark"} /></div>}
-      {shareTunes.length > 0 && <div><h2 className='text-white'>Shared Tunes</h2><Table headers={tableHeaders} data={shareTabledata} addClass={"table-dark"} /></div>}
+      {tunes && <div className='p-3'><h2 className='text-white'>My Tunes</h2><Table headers={tableHeaders} data={tabledata} addClass={"table-dark"} /></div>}
+      {shareTunes.length > 0 && <div className='p-3'><h2 className='text-white'>Shared Tunes</h2><Table headers={tableHeaders} data={shareTabledata} addClass={"table-dark"} /></div>}
 
     </div>
   )
